@@ -559,10 +559,23 @@
   </section>
 
   <!-- ==== Colonne Aide contextuelle ==== -->
-  <!-- ==== Colonne Aide contextuelle ==== -->
-  <aside class="sticky top-4 self-start bg-white rounded-2xl border p-5 h-max">
+  <!-- ==== Aide contextuelle (droite) ==== -->
+  <aside class="rounded-2xl border bg-white p-5 sticky top-4 h-max">
+    <!-- Descriptions par champ (dépend de l’étape) -->
     <h3 class="text-base font-semibold mb-2">{{ help[current()].title }}</h3>
     <div class="space-y-2 text-sm text-gray-700" [innerHTML]="help[current()].html"></div>
+
+    <!-- Conseils pratiques -->
+    <div class="mt-5 border-t pt-4">
+      <h4 class="text-sm font-semibold mb-1">Conseils pratiques pour la rédaction</h4>
+      <div class="space-y-2 text-sm text-gray-700" [innerHTML]="adviceHtml"></div>
+    </div>
+
+    <!-- Sélection des dossiers -->
+    <div class="mt-5 border-t pt-4">
+      <h4 class="text-sm font-semibold mb-1">Concernant la sélection des dossiers</h4>
+      <div class="space-y-2 text-sm text-gray-700" [innerHTML]="selectionHtml"></div>
+    </div>
   </aside>
 
 </div>

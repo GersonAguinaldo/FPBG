@@ -1,9 +1,8 @@
-import { Component, signal, inject, effect } from '@angular/core';
-import {Router, NavigationEnd, RouterLink} from '@angular/router';
+import { Component, signal, inject } from '@angular/core';
+import { Router, NavigationEnd, RouterLink, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
-import {NgClass} from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -16,12 +15,22 @@ export class App {
   auth = inject(AuthService);
   private router = inject(Router);
 
-  // pages qui doivent exploiter toute la largeur
-  private wideMatcher = (url: string) => /\/(form|user\/form|submission)/.test(url);
+  // Routes qui doivent s'afficher en plein écran (sans conteneur centré)
+  private readonly wideRoutes: RegExp[] = [
+    /^\/form(\/|$)/,
+    /^\/user\/form(\/|$)/,
+    /^\/submission(\/|$)/,
+    /^\/dashboard(\/|$)/,
+    /^\/user\/dashboard(\/|$)/
+  ];
 
-  wide = signal<boolean>(this.wideMatcher(this.router.url));
+  private isWide = (url: string) => this.wideRoutes.some(r => r.test(url));
+
+  wide = signal<boolean>(this.isWide(this.router.url));
+
   constructor() {
-    this.router.events.pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => this.wide.set(this.wideMatcher(this.router.url)));
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.wide.set(this.isWide(this.router.url)));
   }
 }
