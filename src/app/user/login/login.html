@@ -1,0 +1,30 @@
+<div class="mx-auto max-w-md">
+  <h1 class="mb-6 text-2xl font-semibold">Connexion porteur</h1>
+
+  <form (ngSubmit)="submit()" [formGroup]="form" class="card space-y-4">
+    <div>
+      <label class="label">Email</label>
+      <input type="email" class="input" formControlName="email">
+      <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+        Email invalide
+      </p>
+    </div>
+
+    <div>
+      <label class="label">Mot de passe</label>
+      <input type="password" class="input" formControlName="password">
+      <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+        6 caractères minimum
+      </p>
+    </div>
+
+    <button class="btn-primary w-full" [disabled]="loading || form.invalid">
+      {{ loading ? 'Connexion...' : 'Se connecter' }}
+    </button>
+
+    <div class="text-center text-sm">
+      Pas de compte ?
+      <a routerLink="/register" class="underline">Créer un compte</a>
+    </div>
+  </form>
+</div>

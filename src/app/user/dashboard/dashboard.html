@@ -1,1 +1,203 @@
-<p>dashboard works!</p>
+<!-- Toggler mobile -->
+<div class="mb-4 md:hidden flex items-center justify-between">
+  <button class="btn px-3 py-2 border" (click)="toggleAside()">
+    {{ asideOpen() ? 'Fermer' : 'Menu' }}
+  </button>
+  <a routerLink="/register" class="btn-primary px-3 py-2">Créer un compte</a>
+</div>
+
+<div class="relative grid gap-6 md:grid-cols-[280px,1fr]">
+  <!-- ===== Off-canvas mobile overlay ===== -->
+  <div *ngIf="asideOpen()" class="fixed inset-0 z-40 bg-black/40 md:hidden" (click)="toggleAside()"></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside
+    class="z-50 md:z-0 md:static fixed top-0 bottom-0 left-0 md:left-auto md:top-auto md:bottom-auto
+           w-[85%] max-w-xs md:w-auto md:max-w-none
+           translate-x-0 md:translate-x-0 transition-transform
+           rounded-none md:rounded-2xl
+           border md:border-gray-200 bg-[#0E2233] text-white shadow-lg md:shadow-sm
+           md:block"
+    [class.-translate-x-full]="!asideOpen()"
+    [class.hidden]="!asideOpen()"  [class.block]="asideOpen()"
+  >
+    <div class="md:hidden px-4 py-3 border-b border-white/10 flex justify-end">
+      <button class="text-white/70" (click)="toggleAside()">✕</button>
+    </div>
+
+    <!-- Profil -->
+    <div class="p-6 border-b border-white/10">
+      <div class="flex items-center gap-4">
+        <ng-container *ngIf="!imgError(); else fallbackAvatar">
+          <img [src]="user().photoUrl" (error)="imgError.set(true)" alt="Photo"
+               class="h-20 w-20 rounded-xl object-cover ring-2 ring-white/20 shrink-0">
+        </ng-container>
+        <ng-template #fallbackAvatar>
+          <div class="h-20 w-20 rounded-xl grid place-items-center bg-white/10 ring-2 ring-white/20 text-2xl font-semibold shrink-0">
+            {{ initials() }}
+          </div>
+        </ng-template>
+
+        <div class="min-w-0">
+          <p class="text-[10px] uppercase tracking-wider text-amber-300/80">Porteur</p>
+          <h3 class="mt-1 font-semibold text-amber-300 leading-snug break-words">
+            {{ user().fullName }}
+          </h3>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-2">
+        <button class="btn-primary w-full bg-amber-500 hover:bg-amber-600 text-black"
+                *ngIf="!hasProject()" (click)="startProject()">Créer votre projet</button>
+
+        <button class="btn w-full border-white/20 bg-white/5"
+                *ngIf="hasProject()" (click)="showAddCollaborator.set(true)">
+          Ajouter un collaborateur
+        </button>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <nav class="p-2 space-y-2 text-sm">
+      <!-- Mon Projet (un seul) -->
+      <div>
+        <div class="px-3 py-2 font-medium text-white/90 flex items-center gap-2">
+          <svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4l2 2h8a2 2 0 012 2v1H2V6a2 2 0 012-2h6z"/><path d="M2 9h22v9a2 2 0 01-2 2H4a2 2 0 01-2-2V9z"/></svg>
+          Mon projet
+        </div>
+        <div class="ml-8 mt-1 space-y-1">
+          <a *ngIf="!hasProject()" (click)="startProject()" class="block px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">Créer le projet</a>
+
+          <a *ngIf="isDraft()" (click)="resumeDraft()" class="block px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">
+            Continuer le brouillon
+          </a>
+
+          <a *ngIf="hasProject() && !isDraft()" (click)="viewProject()" class="block px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">
+            Voir mon projet
+          </a>
+        </div>
+      </div>
+
+      <!-- Mon compte (réduit à Profil) -->
+      <div>
+        <div class="px-3 py-2 font-medium text-white/90 flex items-center gap-2">
+          <svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 100-10 5 5 0 000 10z"/><path d="M4 22a8 8 0 1116 0H4z"/></svg>
+          Mon compte
+        </div>
+        <div class="ml-8 mt-1">
+          <a class="block px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">Profil</a>
+        </div>
+      </div>
+
+      <!-- Déconnexion -->
+      <div class="pt-2">
+        <button class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5" (click)="logout()">
+          Se déconnecter
+        </button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <section class="min-h-[60vh]">
+    <!-- Stats head (toujours une seule ligne de trois cartes) -->
+    <div class="grid gap-4 sm:grid-cols-3">
+      <div class="card">
+        <p class="text-sm text-gray-600">Projet</p>
+        <p class="mt-1 text-2xl font-semibold">{{ hasProject() ? 1 : 0 }}</p>
+      </div>
+      <div class="card">
+        <p class="text-sm text-gray-600">Statut</p>
+        <p class="mt-1 text-2xl font-semibold">
+          {{ status() ? status() : '—' }}
+        </p>
+      </div>
+      <div class="card">
+        <p class="text-sm text-gray-600">Dernière mise à jour</p>
+        <p class="mt-1 text-2xl font-semibold">
+          {{ submission()?.updatedAt ? (submission()?.updatedAt | date:'short') : '—' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Sections conditionnelles -->
+    <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <!-- Pas de projet : CTA principal -->
+      <div class="card" *ngIf="!hasProject()">
+        <h2 class="text-lg font-medium">Démarrer votre projet</h2>
+        <p class="mt-1 text-gray-600">Un seul projet par compte. Vous pourrez reprendre à tout moment.</p>
+        <div class="mt-4">
+          <button class="btn-primary" (click)="startProject()">Créer votre projet</button>
+        </div>
+      </div>
+
+      <!-- Brouillon : reprendre -->
+      <div class="card" *ngIf="isDraft()">
+        <h2 class="text-lg font-medium">Continuer votre brouillon</h2>
+        <p class="mt-1 text-gray-600">Le formulaire se rouvrira à l’étape où vous vous êtes arrêté.</p>
+        <div class="mt-4 flex gap-2">
+          <button class="btn-primary" (click)="resumeDraft()">Continuer</button>
+          <button class="btn px-4 py-2 border" (click)="clearDraftOnly()">Réinitialiser le brouillon</button>
+        </div>
+      </div>
+
+      <!-- Projet soumis/en revue : accès lecture -->
+      <div class="card" *ngIf="hasProject() && !isDraft()">
+        <h2 class="text-lg font-medium">Votre projet</h2>
+        <p class="mt-1 text-gray-600">Statut : <strong>{{ status() }}</strong></p>
+        <div class="mt-4">
+          <button class="btn px-4 py-2 border" (click)="viewProject()">Voir le récapitulatif</button>
+        </div>
+      </div>
+
+      <!-- Collaborateurs : visible seulement si projet existe -->
+      <div class="card" *ngIf="hasProject()">
+        <h2 class="text-lg font-medium">Collaborateurs</h2>
+        <p class="mt-1 text-gray-600">Ajoutez des personnes autorisées à modifier votre dossier.</p>
+
+        <div class="mt-4">
+          <button class="btn px-4 py-2 border" (click)="showAddCollaborator.set(true)">Ajouter un collaborateur</button>
+        </div>
+
+        <div class="mt-4" *ngIf="collaborators().length">
+          <ul class="divide-y rounded-xl border">
+            <li *ngFor="let c of collaborators()" class="p-3 flex items-center justify-between">
+              <div>
+                <p class="font-medium">{{ c.fullName }}</p>
+                <p class="text-xs text-gray-600">{{ c.email }}</p>
+              </div>
+              <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{{ c.role }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire d'ajout collaborateur (dialog simple inline) -->
+    <div class="mt-6 card" *ngIf="showAddCollaborator() && hasProject()">
+      <h2 class="text-lg font-medium">Ajouter un collaborateur</h2>
+      <form class="mt-4 grid gap-4 md:grid-cols-3" [formGroup]="collabForm" (ngSubmit)="addCollaborator()">
+        <div>
+          <label class="label">Nom complet</label>
+          <input class="input" formControlName="fullName" placeholder="Nom Prénom">
+        </div>
+        <div>
+          <label class="label">Email</label>
+          <input class="input" formControlName="email" placeholder="nom@domaine.com">
+        </div>
+        <div>
+          <label class="label">Rôle</label>
+          <select class="input" formControlName="role">
+            <option>Éditeur</option>
+            <option>Lecteur</option>
+            <option>Admin projet</option>
+          </select>
+        </div>
+        <div class="md:col-span-3 flex gap-2">
+          <button class="btn-primary" type="submit">Ajouter</button>
+          <button type="button" class="btn px-4 py-2 border" (click)="showAddCollaborator.set(false)">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>

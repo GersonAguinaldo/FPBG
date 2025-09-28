@@ -1,0 +1,284 @@
+<!-- Layout 3 colonnes : [sidebar] [form] [aide] -->
+<div
+  class="grid gap-6
+         md:grid-cols-[minmax(240px,26%)_1fr_minmax(280px,28%)]
+         xl:grid-cols-[minmax(260px,25%)_1fr_minmax(320px,27%)]"
+>
+  <!-- ==== Sidebar étapes ==== -->
+  <aside class="rounded-2xl border bg-white p-4 sticky top-4 h-max">
+    <div class="text-xs text-gray-600 mb-3">PROGRESSION</div>
+    <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
+      <div class="h-2 rounded-full bg-blue-600" [style.width.%]="progress()"></div>
+    </div>
+
+    <ol class="space-y-1 text-sm">
+      <li *ngFor="let step of help; let i = index">
+        <button type="button"
+                class="w-full text-left px-3 py-2 rounded-lg"
+                [ngClass]="i === current() ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'"
+                (click)="goTo(i)">
+          {{ i+1 }}. {{ step.title }}
+        </button>
+      </li>
+    </ol>
+
+    <div class="mt-4 flex gap-2">
+      <button class="btn px-3 py-2 border" (click)="prev()" [disabled]="current() === 0">Retour</button>
+      <button class="btn-primary px-3 py-2" (click)="next()" [disabled]="current() === 9">Suivant</button>
+    </div>
+  </aside>
+
+  <!-- ==== Colonne Formulaire ==== -->
+  <section class="space-y-6">
+    <!-- STEP 1 -->
+    <div *ngIf="current() === 0" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Demandeur / Soumissionnaire</h2>
+      <form [formGroup]="step1" class="grid gap-4">
+        <mat-form-field appearance="outline"><mat-label>Nom de l'organisation</mat-label><input matInput formControlName="orgName"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Type d'organisation</mat-label><input matInput formControlName="orgType"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Personne de contact</mat-label><input matInput formControlName="contactPerson"></mat-form-field>
+        <div class="grid gap-4 md:grid-cols-2">
+          <mat-form-field appearance="outline"><mat-label>Couverture géographique</mat-label><input matInput formControlName="geoCoverage" placeholder="Locale, Régionale, Nationale…"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Domaines d'intervention</mat-label><input matInput formControlName="domains" placeholder="Conservation, restauration des berges…"></mat-form-field>
+        </div>
+        <mat-form-field appearance="outline"><mat-label>Adresse physique</mat-label><input matInput formControlName="address"></mat-form-field>
+        <div class="grid gap-4 md:grid-cols-2">
+          <mat-form-field appearance="outline"><mat-label>Email de contact</mat-label><input type="email" matInput formControlName="contactEmail"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Téléphone</mat-label><input matInput formControlName="contactPhone"></mat-form-field>
+        </div>
+      </form>
+    </div>
+
+    <!-- STEP 2 -->
+    <div *ngIf="current() === 1" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Proposition de projet</h2>
+      <form [formGroup]="step2" class="grid gap-4">
+        <mat-form-field appearance="outline"><mat-label>Titre du projet</mat-label><input matInput formControlName="title" maxlength="120"><mat-hint align="end">{{ (step2.get('title')?.value || '').length }}/120</mat-hint></mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Lieu d'exécution & groupe cible (≤ 200 mots)</mat-label>
+          <textarea matInput rows="3" formControlName="locationAndTarget"></textarea>
+          <mat-hint class="text-xs text-red-600" *ngIf="step2.get('locationAndTarget')?.errors?.['wordLimit']">Max 200 mots (actuel : {{ step2.get('locationAndTarget')?.errors?.['wordLimit']?.actual }})</mat-hint>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Contexte & justification (≤ 500 mots)</mat-label>
+          <textarea matInput rows="6" formControlName="contextJustification"></textarea>
+          <mat-hint class="text-xs text-red-600" *ngIf="step2.get('contextJustification')?.errors?.['wordLimit']">Max 500 mots (actuel : {{ step2.get('contextJustification')?.errors?.['wordLimit']?.actual }})</mat-hint>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <!-- STEP 3 -->
+    <div *ngIf="current() === 2" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Objectifs & résultats</h2>
+      <form [formGroup]="step3" class="grid gap-4">
+        <mat-form-field appearance="outline"><mat-label>Objectifs (≤ 200 mots)</mat-label><textarea matInput rows="4" formControlName="objectives"></textarea><mat-hint class="text-xs text-red-600" *ngIf="step3.get('objectives')?.errors?.['wordLimit']">Max 200 mots (actuel : {{ step3.get('objectives')?.errors?.['wordLimit']?.actual }})</mat-hint></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Résultats attendus (≤ 100 mots)</mat-label><textarea matInput rows="3" formControlName="expectedResults"></textarea><mat-hint class="text-xs text-red-600" *ngIf="step3.get('expectedResults')?.errors?.['wordLimit']">Max 100 mots (actuel : {{ step3.get('expectedResults')?.errors?.['wordLimit']?.actual }})</mat-hint></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Durée (mois)</mat-label><input type="number" matInput formControlName="durationMonths" min="1" max="48"></mat-form-field>
+      </form>
+    </div>
+
+    <!-- STEP 4 -->
+    <div *ngIf="current() === 3" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Activités & calendrier</h2>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Résumé des activités (≤ 200 mots)</mat-label>
+        <textarea matInput rows="3" [formControl]="activitiesSummary"></textarea>
+        <mat-hint class="text-xs text-red-600" *ngIf="activitiesSummary.errors?.['wordLimit']">
+          Max 200 mots (actuel : {{ activitiesSummary.errors?.['wordLimit']?.actual }})
+        </mat-hint>
+      </mat-form-field>
+
+      <div class="flex items-center justify-between mt-2">
+        <h3 class="font-medium">Activités</h3>
+        <button mat-stroked-button (click)="addActivity()">Ajouter une activité</button>
+      </div>
+
+      <div class="mt-2 grid gap-4">
+        <div class="rounded-xl border p-3" *ngFor="let a of activities.controls; let i = index" [formGroup]="a">
+          <div class="grid gap-3 md:grid-cols-[1fr,auto] md:items-center">
+            <mat-form-field class="w-full" appearance="outline">
+              <mat-label>Libellé</mat-label>
+              <input matInput formControlName="label" placeholder="Ex: Sensibilisation communautaire">
+            </mat-form-field>
+            <button mat-icon-button color="warn" (click)="removeActivity(i)" aria-label="Supprimer"><mat-icon>delete</mat-icon></button>
+          </div>
+
+          <div class="months mt-2">
+            <button type="button" mat-stroked-button *ngFor="let m of months"
+                    [color]="isChecked(a, m) ? 'primary' : undefined"
+                    (click)="toggleMonth(a, m)">
+              M{{ m }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div *ngIf="current() === 4" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Risques & atténuation</h2>
+      <div class="flex items-center justify-between">
+        <span></span><button mat-stroked-button (click)="addRisk()">Ajouter un risque</button>
+      </div>
+      <div class="mt-2 grid gap-4">
+        <div class="rounded-xl border p-3" *ngFor="let r of risks.controls; let i = index" [formGroup]="r">
+          <div class="grid gap-3 md:grid-cols-[1fr,1fr,auto] md:items-center">
+            <mat-form-field appearance="outline"><mat-label>Description</mat-label><input matInput formControlName="description"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Mesures d'atténuation</mat-label><input matInput formControlName="mitigation"></mat-form-field>
+            <button mat-icon-button color="warn" (click)="removeRisk(i)"><mat-icon>delete</mat-icon></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div *ngIf="current() === 5" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Budget estimatif</h2>
+
+      <div class="flex items-center justify-between">
+        <span></span><button mat-stroked-button (click)="addBudgetLine()">Ajouter une ligne</button>
+      </div>
+
+      <div class="mt-2 grid gap-4">
+        <div class="rounded-xl border p-3" *ngFor="let b of budgetLines.controls; let i = index" [formGroup]="b">
+          <div class="grid gap-3 md:grid-cols-5">
+            <mat-form-field appearance="outline"><mat-label>Catégorie</mat-label>
+              <mat-select formControlName="category">
+                <mat-option value="ACTIVITES_TERRAIN">Activités de terrain</mat-option>
+                <mat-option value="INVESTISSEMENTS">Investissements</mat-option>
+                <mat-option value="FONCTIONNEMENT">Fonctionnement</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="md:col-span-2" appearance="outline"><mat-label>Description</mat-label><input matInput formControlName="description"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Total</mat-label><input type="number" min="0" matInput formControlName="total"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Part FPBG</mat-label><input type="number" min="0" matInput formControlName="partFPBG"></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Co-finance</mat-label><input type="number" min="0" matInput formControlName="partCofinance"></mat-form-field>
+          </div>
+          <div class="mt-2"><button mat-icon-button color="warn" (click)="removeBudgetLine(i)"><mat-icon>delete</mat-icon></button></div>
+        </div>
+      </div>
+
+      <div class="mt-2 text-xs text-red-600" *ngIf="budgetError">
+        Alerte : les lignes « Fonctionnement » dépassent 10% du total.
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div *ngIf="current() === 6" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">État & financement</h2>
+      <form [formGroup]="stateStep" class="grid gap-4">
+        <mat-form-field appearance="outline"><mat-label>État d’avancement</mat-label>
+          <mat-select formControlName="projectStage">
+            <mat-option value="CONCEPTION">Conception</mat-option>
+            <mat-option value="DEMARRAGE">Démarrage</mat-option>
+            <mat-option value="AVANCE">Avancé</mat-option>
+            <mat-option value="PHASE_FINALE">Phase finale</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="hasFunding">Financement déjà demandé/obtenu ?</mat-checkbox>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Précisez (bailleur, montant, statut…)</mat-label>
+          <textarea matInput rows="3" formControlName="fundingDetails"></textarea>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <!-- STEP 8 -->
+    <div *ngIf="current() === 7" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Durabilité & réplication</h2>
+      <form [formGroup]="sustainabilityStep" class="grid gap-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Durabilité (comment les effets perdurent ?)</mat-label>
+          <textarea matInput rows="4" formControlName="sustainability"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Potentiel de réplication (ailleurs au Gabon ?)</mat-label>
+          <textarea matInput rows="4" formControlName="replicability"></textarea>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <!-- STEP 9 -->
+    <div *ngIf="current() === 8" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Annexes</h2>
+      <div class="grid gap-3 md:grid-cols-2">
+        <div><label class="text-sm">Lettre de motivation</label><input type="file" (change)="onFileChange($event, 'LETTRE_MOTIVATION')"></div>
+        <div><label class="text-sm">Statuts & règlement</label><input type="file" (change)="onFileChange($event, 'STATUTS_REGLEMENT')"></div>
+        <div><label class="text-sm">Fiche circuit (PME/PMI/Startup)</label><input type="file" (change)="onFileChange($event, 'FICHE_CIRCUIT')"></div>
+        <div><label class="text-sm">RIB</label><input type="file" (change)="onFileChange($event, 'RIB')"></div>
+        <div><label class="text-sm">Agrément / Récépissé</label><input type="file" (change)="onFileChange($event, 'AGREMENT')"></div>
+        <div><label class="text-sm">CV (porteur & responsables)</label><input type="file" (change)="onFileChange($event, 'CV')"></div>
+        <div><label class="text-sm">Budget détaillé</label><input type="file" (change)="onFileChange($event, 'BUDGET_DETAILLE')"></div>
+        <div><label class="text-sm">Chronogramme d'exécution</label><input type="file" (change)="onFileChange($event, 'CHRONOGRAMME')"></div>
+        <div><label class="text-sm">Cartographie (optionnel)</label><input type="file" (change)="onFileChange($event, 'CARTOGRAPHIE')"></div>
+        <div><label class="text-sm">Lettre de soutien (optionnel)</label><input type="file" (change)="onFileChange($event, 'LETTRE_SOUTIEN')"></div>
+      </div>
+    </div>
+
+    <!-- STEP 10 -->
+    <div *ngIf="current() === 9" class="card p-4">
+      <h2 class="text-lg font-medium mb-3">Récapitulatif</h2>
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>Organisation :</strong> {{ step1.value.orgName }} • {{ step1.value.orgType }}<br>
+        <strong>Contact :</strong> {{ step1.value.contactPerson }} — {{ step1.value.contactEmail }} / {{ step1.value.contactPhone }}<br>
+        <strong>Adresse :</strong> {{ step1.value.address }} • <strong>Couverture :</strong> {{ step1.value.geoCoverage }} • <strong>Domaines :</strong> {{ step1.value.domains }}
+      </div>
+
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>Titre :</strong> {{ step2.value.title }}<br>
+        <strong>Lieu & groupe cible :</strong> {{ step2.value.locationAndTarget }}<br>
+        <strong>Contexte :</strong> {{ step2.value.contextJustification }}
+      </div>
+
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>Objectifs :</strong> {{ step3.value.objectives }}<br>
+        <strong>Résultats attendus :</strong> {{ step3.value.expectedResults }}<br>
+        <strong>Durée :</strong> {{ step3.value.durationMonths }} mois
+      </div>
+
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>Résumé activités :</strong> {{ activitiesSummary.value || '—' }}<br>
+        <strong>Activités :</strong>
+        <ul class="list-disc ml-5">
+          <li *ngFor="let a of activities.controls">{{ a.value.label }} — Mois : {{ (a.value.months || []).join(', ') || '—' }}</li>
+        </ul>
+      </div>
+
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>Budget :</strong>
+        <ul class="list-disc ml-5">
+          <li *ngFor="let b of budgetLines.controls">
+            {{ b.value.category }} — {{ b.value.description }} — Total: {{ b.value.total | number:'1.0-0' }}
+          </li>
+        </ul>
+        <div class="text-xs text-red-600" *ngIf="budgetError">Alerte : « Fonctionnement » > 10%.</div>
+      </div>
+
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>État :</strong> {{ stateStep.value.projectStage }}<br>
+        <strong>Financement :</strong> {{ stateStep.value.hasFunding ? 'Oui' : 'Non' }} — {{ stateStep.value.fundingDetails || '—' }}
+      </div>
+
+      <div class="rounded-xl border p-3 mb-3">
+        <strong>Durabilité :</strong> {{ sustainabilityStep.value.sustainability || '—' }}<br>
+        <strong>Réplication :</strong> {{ sustainabilityStep.value.replicability || '—' }}
+      </div>
+
+      <div class="mt-3 flex gap-2">
+        <button class="btn px-3 py-2 border" (click)="prev()">Retour</button>
+        <button class="btn-primary px-3 py-2" (click)="submit()">Soumettre</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==== Colonne Aide contextuelle ==== -->
+  <!-- ==== Colonne Aide contextuelle ==== -->
+  <aside class="rounded-2xl border bg-white p-5 sticky top-4 h-max">
+    <h3 class="text-base font-semibold mb-2">{{ help[current()].title }}</h3>
+    <div class="prose prose-sm max-w-none" [innerHTML]="help[current()].html"></div>
+  </aside>
+
+</div>

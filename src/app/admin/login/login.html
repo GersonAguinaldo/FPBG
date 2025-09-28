@@ -1,0 +1,17 @@
+<div class="mx-auto max-w-md">
+  <h1 class="mb-6 text-2xl font-semibold">Connexion administrateur</h1>
+
+  <form (ngSubmit)="submit()" [formGroup]="form" class="card space-y-4">
+    <div>
+      <label class="label">Email</label>
+      <input type="email" class="input" formControlName="email">
+    </div>
+
+    <div>
+      <label class="label">Mot de passe</label>
+      <input type="password" class="input" formControlName="password">
+    </div>
+
+    <button class="btn-primary w-full" [disabled]="form.invalid">Se connecter</button>
+  </form>
+</div>
