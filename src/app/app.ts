@@ -1,5 +1,5 @@
 import { Component, signal, inject, effect } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import {Router, NavigationEnd, RouterLink} from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
@@ -8,7 +8,7 @@ import {NgClass} from '@angular/common';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NgClass],
+  imports: [RouterOutlet, NgClass, RouterLink],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -90,3 +90,46 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Select */
 .mdc-select, .mat-mdc-select-trigger { border-radius: 12px !important; }
+
+
+/* === Champ "à la Tailwind" : label au-dessus, input propre, focus ring bleu === */
+@layer components {
+  .t-field { @apply grid gap-1; }
+  .t-label { @apply text-sm font-medium text-gray-700; }
+  .t-hint  { @apply text-xs text-gray-500; }
+
+  .t-input {
+    @apply block w-full rounded-xl border border-gray-300 bg-white
+    px-3.5 py-2.5 text-[15px] leading-6
+    placeholder:text-gray-400 shadow-sm
+    outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100;
+  }
+
+  .t-textarea {
+    @apply block w-full rounded-xl border border-gray-300 bg-white
+    px-3.5 py-2.5 text-[15px] leading-6 min-h-[120px]
+    placeholder:text-gray-400 shadow-sm
+    outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100;
+  }
+
+  .t-select {
+    @apply block w-full rounded-xl border border-gray-300 bg-white
+    px-3.5 py-2.5 text-[15px] leading-6
+    shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .65rem center;
+    background-size: 16px 16px;
+    padding-right: 2.25rem; /* place pour la flèche */
+  }
+
+  .t-error { @apply text-xs text-red-600; }
+}
+
+/* État invalide Angular (facultatif) */
+input.t-input.ng-invalid.ng-touched,
+textarea.t-textarea.ng-invalid.ng-touched,
+select.t-select.ng-invalid.ng-touched {
+  border-color: #ef4444; /* red-500 */
+}

@@ -34,82 +34,195 @@
   <!-- ==== Colonne Formulaire ==== -->
   <section class="space-y-6">
     <!-- STEP 1 -->
-    <div *ngIf="current() === 0" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Demandeur / Soumissionnaire</h2>
-      <form [formGroup]="step1" class="grid gap-4">
-        <mat-form-field appearance="outline"><mat-label>Nom de l'organisation</mat-label><input matInput formControlName="orgName"></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Type d'organisation</mat-label><input matInput formControlName="orgType"></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Personne de contact</mat-label><input matInput formControlName="contactPerson"></mat-form-field>
-        <div class="grid gap-4 md:grid-cols-2">
-          <mat-form-field appearance="outline"><mat-label>Couverture géographique</mat-label><input matInput formControlName="geoCoverage" placeholder="Locale, Régionale, Nationale…"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Domaines d'intervention</mat-label><input matInput formControlName="domains" placeholder="Conservation, restauration des berges…"></mat-form-field>
+    <div *ngIf="current() === 0" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Demandeur / Soumissionnaire</h2>
+
+      <form [formGroup]="step1" class="grid gap-5 md:grid-cols-2">
+        <div class="t-field md:col-span-2">
+          <label class="t-label">Nom de l'organisation</label>
+          <input class="t-input" formControlName="orgName" placeholder="Ex : Association Rivière Claire">
         </div>
-        <mat-form-field appearance="outline"><mat-label>Adresse physique</mat-label><input matInput formControlName="address"></mat-form-field>
-        <div class="grid gap-4 md:grid-cols-2">
-          <mat-form-field appearance="outline"><mat-label>Email de contact</mat-label><input type="email" matInput formControlName="contactEmail"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Téléphone</mat-label><input matInput formControlName="contactPhone"></mat-form-field>
+
+        <div class="t-field md:col-span-2">
+          <label class="t-label">Type d'organisation</label>
+          <input class="t-input" formControlName="orgType" placeholder="ONG, Association, Coopérative, PME…">
+        </div>
+
+        <div class="t-field md:col-span-2">
+          <label class="t-label">Personne de contact</label>
+          <input class="t-input" formControlName="contactPerson" placeholder="Nom & prénom">
+        </div>
+
+        <div class="t-field">
+          <label class="t-label">Couverture géographique</label>
+          <input class="t-input" formControlName="geoCoverage" placeholder="Locale, régionale, nationale…">
+        </div>
+
+        <div class="t-field">
+          <label class="t-label">Domaines d’intervention</label>
+          <input class="t-input" formControlName="domains" placeholder="Conservation, restauration des berges…">
+        </div>
+
+        <div class="t-field md:col-span-2">
+          <label class="t-label">Adresse physique</label>
+          <input class="t-input" formControlName="address" placeholder="Adresse complète">
+        </div>
+
+        <div class="t-field">
+          <label class="t-label">Email de contact</label>
+          <input type="email" class="t-input" formControlName="contactEmail" placeholder="nom@domaine.com">
+        </div>
+
+        <div class="t-field">
+          <label class="t-label">Téléphone</label>
+          <input class="t-input" formControlName="contactPhone" placeholder="+241 …">
         </div>
       </form>
     </div>
 
     <!-- STEP 2 -->
-    <div *ngIf="current() === 1" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Proposition de projet</h2>
-      <form [formGroup]="step2" class="grid gap-4">
-        <mat-form-field appearance="outline"><mat-label>Titre du projet</mat-label><input matInput formControlName="title" maxlength="120"><mat-hint align="end">{{ (step2.get('title')?.value || '').length }}/120</mat-hint></mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Lieu d'exécution & groupe cible (≤ 200 mots)</mat-label>
-          <textarea matInput rows="3" formControlName="locationAndTarget"></textarea>
-          <mat-hint class="text-xs text-red-600" *ngIf="step2.get('locationAndTarget')?.errors?.['wordLimit']">Max 200 mots (actuel : {{ step2.get('locationAndTarget')?.errors?.['wordLimit']?.actual }})</mat-hint>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Contexte & justification (≤ 500 mots)</mat-label>
-          <textarea matInput rows="6" formControlName="contextJustification"></textarea>
-          <mat-hint class="text-xs text-red-600" *ngIf="step2.get('contextJustification')?.errors?.['wordLimit']">Max 500 mots (actuel : {{ step2.get('contextJustification')?.errors?.['wordLimit']?.actual }})</mat-hint>
-        </mat-form-field>
+    <div *ngIf="current() === 1" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Proposition de projet</h2>
+
+      <form [formGroup]="step2" class="grid gap-5">
+        <!-- Titre -->
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Titre du projet</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                     placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                 formControlName="title" maxlength="120" placeholder="Ex : Restauration des berges de la rivière X">
+          <div class="text-xs text-gray-500 text-right">
+            {{ (step2.get('title')?.value || '').length }}/120
+          </div>
+        </div>
+
+        <!-- Lieu & groupe cible -->
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Lieu d'exécution &amp; groupe cible (≤ 200 mots)</label>
+          <textarea rows="3"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="locationAndTarget"
+                    placeholder="Zones d’intervention, communautés/bénéficiaires, etc."></textarea>
+          <div class="text-xs text-red-600"
+               *ngIf="step2.get('locationAndTarget')?.errors?.['wordLimit']">
+            Max 200 mots (actuel : {{ step2.get('locationAndTarget')?.errors?.['wordLimit']?.actual }})
+          </div>
+        </div>
+
+        <!-- Contexte & justification -->
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Contexte &amp; justification (≤ 500 mots)</label>
+          <textarea rows="6"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="contextJustification"
+                    placeholder="Problèmes, causes, acteurs, solutions envisagées…"></textarea>
+          <div class="text-xs text-red-600"
+               *ngIf="step2.get('contextJustification')?.errors?.['wordLimit']">
+            Max 500 mots (actuel : {{ step2.get('contextJustification')?.errors?.['wordLimit']?.actual }})
+          </div>
+        </div>
       </form>
     </div>
 
     <!-- STEP 3 -->
-    <div *ngIf="current() === 2" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Objectifs & résultats</h2>
-      <form [formGroup]="step3" class="grid gap-4">
-        <mat-form-field appearance="outline"><mat-label>Objectifs (≤ 200 mots)</mat-label><textarea matInput rows="4" formControlName="objectives"></textarea><mat-hint class="text-xs text-red-600" *ngIf="step3.get('objectives')?.errors?.['wordLimit']">Max 200 mots (actuel : {{ step3.get('objectives')?.errors?.['wordLimit']?.actual }})</mat-hint></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Résultats attendus (≤ 100 mots)</mat-label><textarea matInput rows="3" formControlName="expectedResults"></textarea><mat-hint class="text-xs text-red-600" *ngIf="step3.get('expectedResults')?.errors?.['wordLimit']">Max 100 mots (actuel : {{ step3.get('expectedResults')?.errors?.['wordLimit']?.actual }})</mat-hint></mat-form-field>
-        <mat-form-field appearance="outline"><mat-label>Durée (mois)</mat-label><input type="number" matInput formControlName="durationMonths" min="1" max="48"></mat-form-field>
+    <div *ngIf="current() === 2" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Objectifs &amp; résultats</h2>
+
+      <form [formGroup]="step3" class="grid gap-5">
+        <!-- Objectifs -->
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Objectifs (≤ 200 mots)</label>
+          <textarea rows="4"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="objectives"
+                    placeholder="Formulez des objectifs SMART…"></textarea>
+          <div class="text-xs text-red-600"
+               *ngIf="step3.get('objectives')?.errors?.['wordLimit']">
+            Max 200 mots (actuel : {{ step3.get('objectives')?.errors?.['wordLimit']?.actual }})
+          </div>
+        </div>
+
+        <!-- Résultats attendus -->
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Résultats attendus (≤ 100 mots)</label>
+          <textarea rows="3"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="expectedResults"
+                    placeholder="Changements mesurables attendus…"></textarea>
+          <div class="text-xs text-red-600"
+               *ngIf="step3.get('expectedResults')?.errors?.['wordLimit']">
+            Max 100 mots (actuel : {{ step3.get('expectedResults')?.errors?.['wordLimit']?.actual }})
+          </div>
+        </div>
+
+        <!-- Durée -->
+        <div class="grid gap-1 max-w-xs">
+          <label class="text-sm font-medium text-gray-700">Durée (mois)</label>
+          <input type="number" min="1" max="48"
+                 class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                    placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                 formControlName="durationMonths" placeholder="12">
+        </div>
       </form>
     </div>
 
     <!-- STEP 4 -->
-    <div *ngIf="current() === 3" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Activités & calendrier</h2>
+    <div *ngIf="current() === 3" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Activités &amp; calendrier</h2>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Résumé des activités (≤ 200 mots)</mat-label>
-        <textarea matInput rows="3" [formControl]="activitiesSummary"></textarea>
-        <mat-hint class="text-xs text-red-600" *ngIf="activitiesSummary.errors?.['wordLimit']">
+      <!-- Résumé -->
+      <div class="grid gap-1 mb-2">
+        <label class="text-sm font-medium text-gray-700">Résumé des activités (≤ 200 mots)</label>
+        <textarea rows="3"
+                  class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                     placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  [formControl]="activitiesSummary"
+                  placeholder="Grandes lignes des activités pour atteindre les objectifs…"></textarea>
+        <div class="text-xs text-red-600" *ngIf="activitiesSummary.errors?.['wordLimit']">
           Max 200 mots (actuel : {{ activitiesSummary.errors?.['wordLimit']?.actual }})
-        </mat-hint>
-      </mat-form-field>
+        </div>
+      </div>
 
       <div class="flex items-center justify-between mt-2">
         <h3 class="font-medium">Activités</h3>
-        <button mat-stroked-button (click)="addActivity()">Ajouter une activité</button>
+        <button type="button"
+                class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm"
+                (click)="addActivity()">
+          Ajouter une activité
+        </button>
       </div>
 
-      <div class="mt-2 grid gap-4">
+      <div class="mt-3 grid gap-4">
         <div class="rounded-xl border p-3" *ngFor="let a of activities.controls; let i = index" [formGroup]="a">
           <div class="grid gap-3 md:grid-cols-[1fr,auto] md:items-center">
-            <mat-form-field class="w-full" appearance="outline">
-              <mat-label>Libellé</mat-label>
-              <input matInput formControlName="label" placeholder="Ex: Sensibilisation communautaire">
-            </mat-form-field>
-            <button mat-icon-button color="warn" (click)="removeActivity(i)" aria-label="Supprimer"><mat-icon>delete</mat-icon></button>
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Libellé</label>
+              <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="label" placeholder="Ex : Sensibilisation communautaire">
+            </div>
+
+            <button type="button"
+                    class="h-10 w-10 inline-grid place-items-center rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                    (click)="removeActivity(i)" aria-label="Supprimer">
+              <!-- icône delete -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 001-1h2a1 1 0 001-1h2a1 1 0 001 1h2" />
+              </svg>
+            </button>
           </div>
 
-          <div class="months mt-2">
-            <button type="button" mat-stroked-button *ngFor="let m of months"
-                    [color]="isChecked(a, m) ? 'primary' : undefined"
+          <!-- Mois -->
+          <div class="grid grid-cols-6 md:grid-cols-12 gap-2 mt-3">
+            <button type="button"
+                    class="px-2.5 py-1.5 rounded-lg text-sm border"
+                    *ngFor="let m of months"
+                    [ngClass]="isChecked(a, m) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'"
                     (click)="toggleMonth(a, m)">
               M{{ m }}
             </button>
@@ -119,46 +232,120 @@
     </div>
 
     <!-- STEP 5 -->
-    <div *ngIf="current() === 4" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Risques & atténuation</h2>
+    <div *ngIf="current() === 4" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Risques &amp; atténuation</h2>
+
       <div class="flex items-center justify-between">
-        <span></span><button mat-stroked-button (click)="addRisk()">Ajouter un risque</button>
+        <span></span>
+        <button type="button"
+                class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm"
+                (click)="addRisk()">
+          Ajouter un risque
+        </button>
       </div>
-      <div class="mt-2 grid gap-4">
+
+      <div class="mt-3 grid gap-4">
         <div class="rounded-xl border p-3" *ngFor="let r of risks.controls; let i = index" [formGroup]="r">
           <div class="grid gap-3 md:grid-cols-[1fr,1fr,auto] md:items-center">
-            <mat-form-field appearance="outline"><mat-label>Description</mat-label><input matInput formControlName="description"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Mesures d'atténuation</mat-label><input matInput formControlName="mitigation"></mat-form-field>
-            <button mat-icon-button color="warn" (click)="removeRisk(i)"><mat-icon>delete</mat-icon></button>
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Description</label>
+              <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="description" placeholder="Ex : Crues exceptionnelles, blocages administratifs…">
+            </div>
+
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Mesures d'atténuation</label>
+              <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="mitigation" placeholder="Ex : Phasage, dispositifs anti-crue, médiation locale…">
+            </div>
+
+            <button type="button"
+                    class="h-10 w-10 inline-grid place-items-center rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                    (click)="removeRisk(i)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 001-1h2a1 1 0 001-1h2a1 1 0 001 1h2" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- STEP 6 -->
-    <div *ngIf="current() === 5" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Budget estimatif</h2>
+    <div *ngIf="current() === 5" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Budget estimatif</h2>
 
       <div class="flex items-center justify-between">
-        <span></span><button mat-stroked-button (click)="addBudgetLine()">Ajouter une ligne</button>
+        <span></span>
+        <button type="button"
+                class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm"
+                (click)="addBudgetLine()">
+          Ajouter une ligne
+        </button>
       </div>
 
-      <div class="mt-2 grid gap-4">
+      <div class="mt-3 grid gap-4">
         <div class="rounded-xl border p-3" *ngFor="let b of budgetLines.controls; let i = index" [formGroup]="b">
           <div class="grid gap-3 md:grid-cols-5">
-            <mat-form-field appearance="outline"><mat-label>Catégorie</mat-label>
-              <mat-select formControlName="category">
-                <mat-option value="ACTIVITES_TERRAIN">Activités de terrain</mat-option>
-                <mat-option value="INVESTISSEMENTS">Investissements</mat-option>
-                <mat-option value="FONCTIONNEMENT">Fonctionnement</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field class="md:col-span-2" appearance="outline"><mat-label>Description</mat-label><input matInput formControlName="description"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Total</mat-label><input type="number" min="0" matInput formControlName="total"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Part FPBG</mat-label><input type="number" min="0" matInput formControlName="partFPBG"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Co-finance</mat-label><input type="number" min="0" matInput formControlName="partCofinance"></mat-form-field>
+            <!-- Catégorie -->
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Catégorie</label>
+              <select class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                         outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      formControlName="category">
+                <option value="ACTIVITES_TERRAIN">Activités de terrain</option>
+                <option value="INVESTISSEMENTS">Investissements</option>
+                <option value="FONCTIONNEMENT">Fonctionnement</option>
+              </select>
+            </div>
+
+            <!-- Description -->
+            <div class="grid gap-1 md:col-span-2">
+              <label class="text-sm font-medium text-gray-700">Description</label>
+              <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="description" placeholder="Ex : Atelier de lancement, matériel de mesure…">
+            </div>
+
+            <!-- Montants -->
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Total</label>
+              <input type="number" min="0"
+                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                        outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="total">
+            </div>
+
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Part FPBG</label>
+              <input type="number" min="0"
+                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                        outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="partFPBG">
+            </div>
+
+            <div class="grid gap-1">
+              <label class="text-sm font-medium text-gray-700">Co-finance</label>
+              <input type="number" min="0"
+                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                        outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     formControlName="partCofinance">
+            </div>
           </div>
-          <div class="mt-2"><button mat-icon-button color="warn" (click)="removeBudgetLine(i)"><mat-icon>delete</mat-icon></button></div>
+
+          <div class="mt-2">
+            <button type="button"
+                    class="h-10 w-10 inline-grid place-items-center rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                    (click)="removeBudgetLine(i)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 001-1h2a1 1 0 001-1h2a1 1 0 001 1h2" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -168,62 +355,153 @@
     </div>
 
     <!-- STEP 7 -->
-    <div *ngIf="current() === 6" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">État & financement</h2>
-      <form [formGroup]="stateStep" class="grid gap-4">
-        <mat-form-field appearance="outline"><mat-label>État d’avancement</mat-label>
-          <mat-select formControlName="projectStage">
-            <mat-option value="CONCEPTION">Conception</mat-option>
-            <mat-option value="DEMARRAGE">Démarrage</mat-option>
-            <mat-option value="AVANCE">Avancé</mat-option>
-            <mat-option value="PHASE_FINALE">Phase finale</mat-option>
-          </mat-select>
-        </mat-form-field>
+    <div *ngIf="current() === 6" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">État &amp; financement</h2>
 
-        <mat-checkbox formControlName="hasFunding">Financement déjà demandé/obtenu ?</mat-checkbox>
+      <form [formGroup]="stateStep" class="grid gap-5">
+        <div class="grid gap-1 max-w-md">
+          <label class="text-sm font-medium text-gray-700">État d’avancement</label>
+          <select class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                     outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  formControlName="projectStage">
+            <option value="CONCEPTION">Conception</option>
+            <option value="DEMARRAGE">Démarrage</option>
+            <option value="AVANCE">Avancé</option>
+            <option value="PHASE_FINALE">Phase finale</option>
+          </select>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Précisez (bailleur, montant, statut…)</mat-label>
-          <textarea matInput rows="3" formControlName="fundingDetails"></textarea>
-        </mat-form-field>
+        <label class="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" formControlName="hasFunding"
+                 class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          Financement déjà demandé/obtenu ?
+        </label>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Précisez (bailleur, montant, statut…)</label>
+          <textarea rows="3"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="fundingDetails"></textarea>
+        </div>
       </form>
     </div>
 
     <!-- STEP 8 -->
-    <div *ngIf="current() === 7" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Durabilité & réplication</h2>
-      <form [formGroup]="sustainabilityStep" class="grid gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Durabilité (comment les effets perdurent ?)</mat-label>
-          <textarea matInput rows="4" formControlName="sustainability"></textarea>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Potentiel de réplication (ailleurs au Gabon ?)</mat-label>
-          <textarea matInput rows="4" formControlName="replicability"></textarea>
-        </mat-form-field>
+    <div *ngIf="current() === 7" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Durabilité &amp; réplication</h2>
+
+      <form [formGroup]="sustainabilityStep" class="grid gap-5">
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Durabilité (comment les effets perdurent ?)</label>
+          <textarea rows="4"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="sustainability"></textarea>
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Potentiel de réplication (ailleurs au Gabon ?)</label>
+          <textarea rows="4"
+                    class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    formControlName="replicability"></textarea>
+        </div>
       </form>
     </div>
 
     <!-- STEP 9 -->
-    <div *ngIf="current() === 8" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Annexes</h2>
-      <div class="grid gap-3 md:grid-cols-2">
-        <div><label class="text-sm">Lettre de motivation</label><input type="file" (change)="onFileChange($event, 'LETTRE_MOTIVATION')"></div>
-        <div><label class="text-sm">Statuts & règlement</label><input type="file" (change)="onFileChange($event, 'STATUTS_REGLEMENT')"></div>
-        <div><label class="text-sm">Fiche circuit (PME/PMI/Startup)</label><input type="file" (change)="onFileChange($event, 'FICHE_CIRCUIT')"></div>
-        <div><label class="text-sm">RIB</label><input type="file" (change)="onFileChange($event, 'RIB')"></div>
-        <div><label class="text-sm">Agrément / Récépissé</label><input type="file" (change)="onFileChange($event, 'AGREMENT')"></div>
-        <div><label class="text-sm">CV (porteur & responsables)</label><input type="file" (change)="onFileChange($event, 'CV')"></div>
-        <div><label class="text-sm">Budget détaillé</label><input type="file" (change)="onFileChange($event, 'BUDGET_DETAILLE')"></div>
-        <div><label class="text-sm">Chronogramme d'exécution</label><input type="file" (change)="onFileChange($event, 'CHRONOGRAMME')"></div>
-        <div><label class="text-sm">Cartographie (optionnel)</label><input type="file" (change)="onFileChange($event, 'CARTOGRAPHIE')"></div>
-        <div><label class="text-sm">Lettre de soutien (optionnel)</label><input type="file" (change)="onFileChange($event, 'LETTRE_SOUTIEN')"></div>
+    <div *ngIf="current() === 8" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Annexes</h2>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Lettre de motivation</label>
+          <input type="file"
+                 class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'LETTRE_MOTIVATION')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Statuts & règlement</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'STATUTS_REGLEMENT')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Fiche circuit (PME/PMI/Startup)</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'FICHE_CIRCUIT')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">RIB</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'RIB')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Agrément / Récépissé</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'AGREMENT')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">CV (porteur & responsables)</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'CV')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Budget détaillé</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'BUDGET_DETAILLE')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Chronogramme d'exécution</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'CHRONOGRAMME')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Cartographie (optionnel)</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'CARTOGRAPHIE')">
+        </div>
+
+        <div class="grid gap-1">
+          <label class="text-sm font-medium text-gray-700">Lettre de soutien (optionnel)</label>
+          <input type="file" class="block w-full text-sm text-gray-700
+                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                 (change)="onFileChange($event, 'LETTRE_SOUTIEN')">
+        </div>
       </div>
     </div>
 
     <!-- STEP 10 -->
-    <div *ngIf="current() === 9" class="card p-4">
-      <h2 class="text-lg font-medium mb-3">Récapitulatif</h2>
+    <div *ngIf="current() === 9" class="card p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Récapitulatif</h2>
+
       <div class="rounded-xl border p-3 mb-3">
         <strong>Organisation :</strong> {{ step1.value.orgName }} • {{ step1.value.orgType }}<br>
         <strong>Contact :</strong> {{ step1.value.contactPerson }} — {{ step1.value.contactEmail }} / {{ step1.value.contactPhone }}<br>
@@ -232,7 +510,7 @@
 
       <div class="rounded-xl border p-3 mb-3">
         <strong>Titre :</strong> {{ step2.value.title }}<br>
-        <strong>Lieu & groupe cible :</strong> {{ step2.value.locationAndTarget }}<br>
+        <strong>Lieu &amp; groupe cible :</strong> {{ step2.value.locationAndTarget }}<br>
         <strong>Contexte :</strong> {{ step2.value.contextJustification }}
       </div>
 
@@ -246,7 +524,9 @@
         <strong>Résumé activités :</strong> {{ activitiesSummary.value || '—' }}<br>
         <strong>Activités :</strong>
         <ul class="list-disc ml-5">
-          <li *ngFor="let a of activities.controls">{{ a.value.label }} — Mois : {{ (a.value.months || []).join(', ') || '—' }}</li>
+          <li *ngFor="let a of activities.controls">
+            {{ a.value.label }} — Mois : {{ (a.value.months || []).join(', ') || '—' }}
+          </li>
         </ul>
       </div>
 
@@ -257,7 +537,7 @@
             {{ b.value.category }} — {{ b.value.description }} — Total: {{ b.value.total | number:'1.0-0' }}
           </li>
         </ul>
-        <div class="text-xs text-red-600" *ngIf="budgetError">Alerte : « Fonctionnement » > 10%.</div>
+        <div class="text-xs text-red-600" *ngIf="budgetError">Alerte : « Fonctionnement » &gt; 10%.</div>
       </div>
 
       <div class="rounded-xl border p-3 mb-3">
@@ -271,10 +551,11 @@
       </div>
 
       <div class="mt-3 flex gap-2">
-        <button class="btn px-3 py-2 border" (click)="prev()">Retour</button>
-        <button class="btn-primary px-3 py-2" (click)="submit()">Soumettre</button>
+        <button class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50" (click)="prev()">Retour</button>
+        <button class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" (click)="submit()">Soumettre</button>
       </div>
     </div>
+
   </section>
 
   <!-- ==== Colonne Aide contextuelle ==== -->
