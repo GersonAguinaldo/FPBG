@@ -54,3 +54,39 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mdc-select, .mat-mdc-select-trigger {
   border-radius: 0.75rem !important;
 }
+
+/* ===== Material look "Tailwind" ===== */
+:root {
+  /* rayon des champs Material */
+  --mdc-outlined-text-field-container-shape: 12px;  /* rounded-xl */
+}
+
+/* largeur par défaut */
+.mat-mdc-form-field { width: 100%; }
+
+/* Bord fin gris et focus ring bleu */
+.mdc-text-field--outlined .mdc-notched-outline__leading,
+.mdc-text-field--outlined .mdc-notched-outline__notch,
+.mdc-text-field--outlined .mdc-notched-outline__trailing {
+  border-color: #e5e7eb; /* gray-200 */
+  border-width: 1px;
+}
+
+.mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__leading,
+.mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__notch,
+.mdc-text-field--outlined.mdc-text-field--focused .mdc-notched-outline__trailing {
+  border-color: #3b82f6 !important; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59,130,246,.15);
+}
+
+/* Hauteur et paddings confort */
+.mat-mdc-text-field-wrapper { border-radius: 12px !important; }
+.mdc-text-field__input {
+  padding-top: .625rem !important;
+  padding-bottom: .625rem !important;
+}
+.mdc-floating-label { color:#374151; }             /* gray-700 */
+.mdc-text-field--focused .mdc-floating-label { color:#111827; } /* gray-900 */
+
+/* Select */
+.mdc-select, .mat-mdc-select-trigger { border-radius: 12px !important; }

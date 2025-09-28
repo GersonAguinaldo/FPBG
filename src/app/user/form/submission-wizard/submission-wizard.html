@@ -1,11 +1,14 @@
 <!-- Layout 3 colonnes : [sidebar] [form] [aide] -->
 <div
-  class="grid gap-6
-         md:grid-cols-[minmax(240px,26%)_1fr_minmax(280px,28%)]
-         xl:grid-cols-[minmax(260px,25%)_1fr_minmax(320px,27%)]"
+  class="w-full
+         grid gap-4 lg:gap-6
+         grid-cols-1
+         lg:grid-cols-[minmax(240px,27%)_1fr_minmax(280px,28%)]
+         xl:grid-cols-[minmax(260px,26%)_1fr_minmax(340px,28%)]"
 >
+
   <!-- ==== Sidebar étapes ==== -->
-  <aside class="rounded-2xl border bg-white p-4 sticky top-4 h-max">
+  <aside class="rounded-2xl self-start border p-5 bg-white sticky top-4 h-max">
     <div class="text-xs text-gray-600 mb-3">PROGRESSION</div>
     <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
       <div class="h-2 rounded-full bg-blue-600" [style.width.%]="progress()"></div>
@@ -276,9 +279,9 @@
 
   <!-- ==== Colonne Aide contextuelle ==== -->
   <!-- ==== Colonne Aide contextuelle ==== -->
-  <aside class="rounded-2xl border bg-white p-5 sticky top-4 h-max">
+  <aside class="sticky top-4 self-start bg-white rounded-2xl border p-5 h-max">
     <h3 class="text-base font-semibold mb-2">{{ help[current()].title }}</h3>
-    <div class="prose prose-sm max-w-none" [innerHTML]="help[current()].html"></div>
+    <div class="space-y-2 text-sm text-gray-700" [innerHTML]="help[current()].html"></div>
   </aside>
 
 </div>

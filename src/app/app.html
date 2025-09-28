@@ -1,3 +1,4 @@
+<!-- Entête publique seulement si NON connecté -->
 <header class="border-b bg-white">
   <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
     <a routerLink="/" class="font-semibold">FPBG • Guichet unique</a>
@@ -8,6 +9,7 @@
   </div>
 </header>
 
-<main class="mx-auto max-w-6xl px-4 py-8">
+<!-- ⬇️ si page large => pas de max-width, pas de padding horizontal -->
+<main [ngClass]="wide() ? 'w-full max-w-none px-0 py-6' : 'mx-auto max-w-6xl px-4 py-8'">
   <router-outlet />
 </main>
