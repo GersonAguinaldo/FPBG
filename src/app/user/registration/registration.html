@@ -1,42 +1,81 @@
-<div class="mx-auto max-w-md">
-  <h1 class="mb-6 text-2xl font-semibold">Créer un compte porteur</h1>
+<div class="min-h-screen grid place-items-center bg-[#1f3b52] px-4">
+  <div class="w-full max-w-xl rounded-2xl bg-[#112B3C] text-white p-8 shadow-2xl border border-white/10">
 
-  <form (ngSubmit)="submit()" [formGroup]="form" class="card space-y-4">
-    <div>
-      <label class="label">Nom complet</label>
-      <input class="input" formControlName="fullName" placeholder="Jane DOE" />
-      <!-- <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">
-        Nom requis (2 caractères min.)
-      </p> -->
+    <div class="flex justify-center">
+      <img src="assets/logo.png" alt="FPBG" class="h-14 w-auto" />
     </div>
 
-    <div>
-      <label class="label">Email</label>
-      <input type="email" class="input" formControlName="email" placeholder="nom@domaine.com" />
-      <!-- <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.email.touched && form.controls.email.invalid">
-        Email invalide
-      </p> -->
+    <h1 class="mt-4 text-center text-4xl font-bold">Bienvenue</h1>
+
+    <!-- Onglets -->
+    <div class="mt-6 grid grid-cols-2 gap-3">
+      <a
+        routerLink="/login"
+        routerLinkActive="bg-green-600 text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="rounded-md bg-[#173B52] text-slate-200 px-4 py-2 text-sm font-semibold text-center hover:bg-[#1C4660] transition"
+      >Connexion</a>
+
+      <a
+        routerLink="/register"
+        routerLinkActive="bg-green-600 text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="rounded-md bg-[#173B52] text-slate-200 px-4 py-2 text-sm font-semibold text-center hover:bg-[#1C4660] transition"
+      >Inscription</a>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <!-- Formulaire -->
+    <form (ngSubmit)="submit()" [formGroup]="form" class="mt-6 space-y-4">
       <div>
-        <label class="label">Mot de passe</label>
-        <input type="password" class="input" formControlName="password" />
+        <label class="block text-sm mb-1">Nom complet</label>
+        <input
+          formControlName="fullName"
+          placeholder="Jane DOE"
+          class="w-full rounded-lg bg-[#1f4a63] border border-white/10 text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
       </div>
+
       <div>
-        <label class="label">Confirmer</label>
-        <input type="password" class="input" formControlName="confirm" />
-        <!-- <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.confirm.touched && form.hasError('mustMatch', ['confirm'])">
-          Les mots de passe ne correspondent pas
-        </p> -->
+        <label class="block text-sm mb-1">Adresse e-mail</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="votre.email@exemple.com"
+          class="w-full rounded-lg bg-[#1f4a63] border border-white/10 text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
       </div>
-    </div>
 
-    <!-- Bouton actif même si le formulaire est vide (front-only) -->
-    <button class="btn-primary w-full">Créer le compte</button>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label class="block text-sm mb-1">Mot de passe</label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            class="w-full rounded-lg bg-[#1f4a63] border border-white/10 text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
 
-    <div class="text-center text-sm">
-      Déjà inscrit ? <a routerLink="/login" class="underline">Se connecter</a>
-    </div>
-  </form>
+        <div>
+          <label class="block text-sm mb-1">Confirmer</label>
+          <input
+            type="password"
+            formControlName="confirm"
+            placeholder="••••••••"
+            class="w-full rounded-lg bg-[#1f4a63] border border-white/10 text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+      </div>
+
+      <!-- Bouton (actif même sans validation si tu veux rester front-only) -->
+      <button class="w-full rounded-lg bg-green-600 py-3 font-semibold hover:bg-green-700">
+        Créer le compte
+      </button>
+
+      <p class="text-center text-sm text-slate-300">
+        Déjà inscrit ?
+        <a routerLink="/login" class="underline underline-offset-2 text-white">Se connecter</a>
+      </p>
+    </form>
+  </div>
 </div>

@@ -1,24 +1,41 @@
+<!-- ENTÊTE FPBG (style document) -->
+<section class="mb-6 rounded-xl border bg-white overflow-hidden">
+  <div class="h-1.5 w-full bg-green-600"></div>
+  <div class="px-5 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="assets/logo.png" alt="FPBG" class="h-10 w-auto">
+      <span class="inline-flex items-center rounded-full bg-green-100 text-green-700 px-3 py-1 text-xs font-medium">
+        Modèle de Note Conceptuelle — FPBG
+      </span>
+    </div>
+    <div class="text-xs text-slate-500">Maximum 5 pages (hors annexes)</div>
+  </div>
+  <div class="px-5 pb-5">
+    <h1 class="text-center text-xl sm:text-2xl font-semibold">
+      APPEL À PROJET OBLIGATIONS BLEUES FPBG
+    </h1>
+  </div>
+</section>
+
 <!-- Layout 3 colonnes : [sidebar] [form] [aide] -->
 <div
-  class="w-full
-         grid gap-4 lg:gap-6
+  class="w-full grid gap-4 lg:gap-6
          grid-cols-1
          lg:grid-cols-[minmax(240px,27%)_1fr_minmax(280px,28%)]
-         xl:grid-cols-[minmax(260px,26%)_1fr_minmax(340px,28%)]"
->
+         xl:grid-cols-[minmax(260px,26%)_1fr_minmax(340px,28%)]">
 
   <!-- ==== Sidebar étapes ==== -->
-  <aside class="rounded-2xl self-start border p-5 bg-white sticky top-4 h-max">
+  <aside class="self-start sticky top-4 h-max rounded-xl border p-5 bg-white">
     <div class="text-xs text-gray-600 mb-3">PROGRESSION</div>
     <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
-      <div class="h-2 rounded-full bg-blue-600" [style.width.%]="progress()"></div>
+      <div class="h-2 rounded-full bg-green-600" [style.width.%]="progress()"></div>
     </div>
 
     <ol class="space-y-1 text-sm">
-      <li *ngFor="let step of help; let i = index">
+      <li *ngFor="let step of help; let i = index; trackBy: trackByIndex">
         <button type="button"
-                class="w-full text-left px-3 py-2 rounded-lg"
-                [ngClass]="i === current() ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'"
+                class="w-full text-left px-3 py-2 rounded-lg transition"
+                [ngClass]="i === current() ? 'bg-green-600 text-white' : 'hover:bg-green-50'"
                 (click)="goTo(i)">
           {{ i+1 }}. {{ step.title }}
         </button>
@@ -26,71 +43,95 @@
     </ol>
 
     <div class="mt-4 flex gap-2">
-      <button class="btn px-3 py-2 border" (click)="prev()" [disabled]="current() === 0">Retour</button>
-      <button class="btn-primary px-3 py-2" (click)="next()" [disabled]="current() === 9">Suivant</button>
+      <button class="px-3 py-2 rounded-md border hover:bg-slate-50" (click)="prev()" [disabled]="current() === 0">Retour</button>
+      <button class="px-3 py-2 rounded-md bg-green-600 text-white hover:bg-green-700"
+              (click)="next()" [disabled]="current() === 9 || !canGoNext()">
+        Suivant
+      </button>
     </div>
   </aside>
 
   <!-- ==== Colonne Formulaire ==== -->
   <section class="space-y-6">
+
     <!-- STEP 1 -->
-    <div *ngIf="current() === 0" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">Demandeur / Soumissionnaire</h2>
+    <div *ngIf="current() === 0" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Informations sur le Demandeur / Soumissionnaire</h2>
 
       <form [formGroup]="step1" class="grid gap-5 md:grid-cols-2">
-        <div class="t-field md:col-span-2">
-          <label class="t-label">Nom de l'organisation</label>
-          <input class="t-input" formControlName="orgName" placeholder="Ex : Association Rivière Claire">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Nom de l'organisation</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="orgName" placeholder="Ex : Association Rivière Claire">
         </div>
 
-        <div class="t-field md:col-span-2">
-          <label class="t-label">Type d'organisation</label>
-          <input class="t-input" formControlName="orgType" placeholder="ONG, Association, Coopérative, PME…">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Type d'organisation</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="orgType" placeholder="ONG, Association, Coopérative, PME…">
         </div>
 
-        <div class="t-field md:col-span-2">
-          <label class="t-label">Personne de contact</label>
-          <input class="t-input" formControlName="contactPerson" placeholder="Nom & prénom">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Personne de contact</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="contactPerson" placeholder="Nom & prénom">
         </div>
 
-        <div class="t-field">
-          <label class="t-label">Couverture géographique</label>
-          <input class="t-input" formControlName="geoCoverage" placeholder="Locale, régionale, nationale…">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Couverture géographique</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="geoCoverage" placeholder="Locale, régionale, nationale…">
         </div>
 
-        <div class="t-field">
-          <label class="t-label">Domaines d’intervention</label>
-          <input class="t-input" formControlName="domains" placeholder="Conservation, restauration des berges…">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Domaines d’intervention</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="domains" placeholder="Conservation, restauration des berges…">
         </div>
 
-        <div class="t-field md:col-span-2">
-          <label class="t-label">Adresse physique</label>
-          <input class="t-input" formControlName="address" placeholder="Adresse complète">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700">Adresse physique</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="address" placeholder="Adresse complète">
         </div>
 
-        <div class="t-field">
-          <label class="t-label">Email de contact</label>
-          <input type="email" class="t-input" formControlName="contactEmail" placeholder="nom@domaine.com">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email de contact</label>
+          <input type="email" class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="contactEmail" placeholder="nom@domaine.com">
         </div>
 
-        <div class="t-field">
-          <label class="t-label">Téléphone</label>
-          <input class="t-input" formControlName="contactPhone" placeholder="+241 …">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Téléphone</label>
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
+                 formControlName="contactPhone" placeholder="+241 …">
         </div>
       </form>
     </div>
 
     <!-- STEP 2 -->
-    <div *ngIf="current() === 1" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">Proposition de projet</h2>
+    <div *ngIf="current() === 1" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-2">Proposition de Projet</h2>
 
       <form [formGroup]="step2" class="grid gap-5">
         <!-- Titre -->
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Titre du projet</label>
           <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                     placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                  formControlName="title" maxlength="120" placeholder="Ex : Restauration des berges de la rivière X">
+          <div class="text-xs text-slate-600">
+            <span class="font-semibold text-green-700">Exemple :</span>
+            Restauration des mangroves de XXX ha dans la zone de XXXX pour la conservation de la Biodiversité et la Résilience Climatique.
+          </div>
           <div class="text-xs text-gray-500 text-right">
             {{ (step2.get('title')?.value || '').length }}/120
           </div>
@@ -101,7 +142,7 @@
           <label class="text-sm font-medium text-gray-700">Lieu d'exécution &amp; groupe cible (≤ 200 mots)</label>
           <textarea rows="3"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="locationAndTarget"
                     placeholder="Zones d’intervention, communautés/bénéficiaires, etc."></textarea>
           <div class="text-xs text-red-600"
@@ -115,7 +156,7 @@
           <label class="text-sm font-medium text-gray-700">Contexte &amp; justification (≤ 500 mots)</label>
           <textarea rows="6"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="contextJustification"
                     placeholder="Problèmes, causes, acteurs, solutions envisagées…"></textarea>
           <div class="text-xs text-red-600"
@@ -127,8 +168,8 @@
     </div>
 
     <!-- STEP 3 -->
-    <div *ngIf="current() === 2" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">Objectifs &amp; résultats</h2>
+    <div *ngIf="current() === 2" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Objectifs du projet &amp; Résultats</h2>
 
       <form [formGroup]="step3" class="grid gap-5">
         <!-- Objectifs -->
@@ -136,7 +177,7 @@
           <label class="text-sm font-medium text-gray-700">Objectifs (≤ 200 mots)</label>
           <textarea rows="4"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="objectives"
                     placeholder="Formulez des objectifs SMART…"></textarea>
           <div class="text-xs text-red-600"
@@ -150,7 +191,7 @@
           <label class="text-sm font-medium text-gray-700">Résultats attendus (≤ 100 mots)</label>
           <textarea rows="3"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="expectedResults"
                     placeholder="Changements mesurables attendus…"></textarea>
           <div class="text-xs text-red-600"
@@ -164,22 +205,22 @@
           <label class="text-sm font-medium text-gray-700">Durée (mois)</label>
           <input type="number" min="1" max="48"
                  class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                    placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                  formControlName="durationMonths" placeholder="12">
         </div>
       </form>
     </div>
 
     <!-- STEP 4 -->
-    <div *ngIf="current() === 3" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">Activités &amp; calendrier</h2>
+    <div *ngIf="current() === 3" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Activités principales &amp; calendrier d’exécution</h2>
 
       <!-- Résumé -->
       <div class="grid gap-1 mb-2">
         <label class="text-sm font-medium text-gray-700">Résumé des activités (≤ 200 mots)</label>
         <textarea rows="3"
                   class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                     placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                   [formControl]="activitiesSummary"
                   placeholder="Grandes lignes des activités pour atteindre les objectifs…"></textarea>
         <div class="text-xs text-red-600" *ngIf="activitiesSummary.errors?.['wordLimit']">
@@ -197,19 +238,20 @@
       </div>
 
       <div class="mt-3 grid gap-4">
-        <div class="rounded-xl border p-3" *ngFor="let a of activities.controls; let i = index" [formGroup]="a">
+        <div class="rounded-xl border p-3"
+             *ngFor="let a of activities.controls; let i = index; trackBy: trackByIndex"
+             [formGroup]="a">
           <div class="grid gap-3 md:grid-cols-[1fr,auto] md:items-center">
             <div class="grid gap-1">
               <label class="text-sm font-medium text-gray-700">Libellé</label>
               <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                         placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="label" placeholder="Ex : Sensibilisation communautaire">
             </div>
 
             <button type="button"
                     class="h-10 w-10 inline-grid place-items-center rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
                     (click)="removeActivity(i)" aria-label="Supprimer">
-              <!-- icône delete -->
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 001-1h2a1 1 0 001-1h2a1 1 0 001 1h2" />
@@ -220,20 +262,25 @@
           <!-- Mois -->
           <div class="grid grid-cols-6 md:grid-cols-12 gap-2 mt-3">
             <button type="button"
-                    class="px-2.5 py-1.5 rounded-lg text-sm border"
-                    *ngFor="let m of months"
-                    [ngClass]="isChecked(a, m) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'"
+                    class="px-2.5 py-1.5 rounded-lg text-sm border transition"
+                    *ngFor="let m of months; let idx = index; trackBy: trackByIndex"
+                    [ngClass]="isChecked(a, m) ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-700 border-gray-300'"
+                    [attr.aria-pressed]="isChecked(a, m)"
                     (click)="toggleMonth(a, m)">
-              M{{ m }}
+              {{ monthsLabels[idx] }}
             </button>
           </div>
         </div>
       </div>
+
+      <div class="mt-2 text-xs text-red-600" *ngIf="activities.errors?.['arrayMin']">
+        Au moins une activité est requise.
+      </div>
     </div>
 
     <!-- STEP 5 -->
-    <div *ngIf="current() === 4" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">Risques &amp; atténuation</h2>
+    <div *ngIf="current() === 4" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Risques &amp; mesures d’atténuation</h2>
 
       <div class="flex items-center justify-between">
         <span></span>
@@ -245,19 +292,21 @@
       </div>
 
       <div class="mt-3 grid gap-4">
-        <div class="rounded-xl border p-3" *ngFor="let r of risks.controls; let i = index" [formGroup]="r">
+        <div class="rounded-xl border p-3"
+             *ngFor="let r of risks.controls; let i = index; trackBy: trackByIndex"
+             [formGroup]="r">
           <div class="grid gap-3 md:grid-cols-[1fr,1fr,auto] md:items-center">
             <div class="grid gap-1">
               <label class="text-sm font-medium text-gray-700">Description</label>
               <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                         placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="description" placeholder="Ex : Crues exceptionnelles, blocages administratifs…">
             </div>
 
             <div class="grid gap-1">
               <label class="text-sm font-medium text-gray-700">Mesures d'atténuation</label>
               <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                         placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="mitigation" placeholder="Ex : Phasage, dispositifs anti-crue, médiation locale…">
             </div>
 
@@ -275,7 +324,7 @@
     </div>
 
     <!-- STEP 6 -->
-    <div *ngIf="current() === 5" class="card p-5 md:p-6">
+    <div *ngIf="current() === 5" class="rounded-xl border bg-white p-5 md:p-6">
       <h2 class="text-lg font-semibold mb-4">Budget estimatif</h2>
 
       <div class="flex items-center justify-between">
@@ -288,13 +337,15 @@
       </div>
 
       <div class="mt-3 grid gap-4">
-        <div class="rounded-xl border p-3" *ngFor="let b of budgetLines.controls; let i = index" [formGroup]="b">
+        <div class="rounded-xl border p-3"
+             *ngFor="let b of budgetLines.controls; let i = index; trackBy: trackByIndex"
+             [formGroup]="b">
           <div class="grid gap-3 md:grid-cols-5">
             <!-- Catégorie -->
             <div class="grid gap-1">
               <label class="text-sm font-medium text-gray-700">Catégorie</label>
               <select class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                         outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                         outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                       formControlName="category">
                 <option value="ACTIVITES_TERRAIN">Activités de terrain</option>
                 <option value="INVESTISSEMENTS">Investissements</option>
@@ -306,7 +357,7 @@
             <div class="grid gap-1 md:col-span-2">
               <label class="text-sm font-medium text-gray-700">Description</label>
               <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                         placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                         placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="description" placeholder="Ex : Atelier de lancement, matériel de mesure…">
             </div>
 
@@ -315,7 +366,7 @@
               <label class="text-sm font-medium text-gray-700">Total</label>
               <input type="number" min="0"
                      class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                        outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="total">
             </div>
 
@@ -323,7 +374,7 @@
               <label class="text-sm font-medium text-gray-700">Part FPBG</label>
               <input type="number" min="0"
                      class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                        outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="partFPBG">
             </div>
 
@@ -331,9 +382,13 @@
               <label class="text-sm font-medium text-gray-700">Co-finance</label>
               <input type="number" min="0"
                      class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                        outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                      formControlName="partCofinance">
             </div>
+          </div>
+
+          <div class="mt-1 text-xs text-red-600" *ngIf="b.errors?.['amountsMismatch']">
+            La somme (FPBG + cofinancement) doit égaler le Total.
           </div>
 
           <div class="mt-2">
@@ -355,14 +410,14 @@
     </div>
 
     <!-- STEP 7 -->
-    <div *ngIf="current() === 6" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">État &amp; financement</h2>
+    <div *ngIf="current() === 6" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">État d’avancement &amp; financement</h2>
 
       <form [formGroup]="stateStep" class="grid gap-5">
         <div class="grid gap-1 max-w-md">
           <label class="text-sm font-medium text-gray-700">État d’avancement</label>
           <select class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                     outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                     outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                   formControlName="projectStage">
             <option value="CONCEPTION">Conception</option>
             <option value="DEMARRAGE">Démarrage</option>
@@ -373,7 +428,7 @@
 
         <label class="inline-flex items-center gap-2 text-sm">
           <input type="checkbox" formControlName="hasFunding"
-                 class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                 class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500">
           Financement déjà demandé/obtenu ?
         </label>
 
@@ -381,22 +436,22 @@
           <label class="text-sm font-medium text-gray-700">Précisez (bailleur, montant, statut…)</label>
           <textarea rows="3"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="fundingDetails"></textarea>
         </div>
       </form>
     </div>
 
     <!-- STEP 8 -->
-    <div *ngIf="current() === 7" class="card p-5 md:p-6">
-      <h2 class="text-lg font-semibold mb-4">Durabilité &amp; réplication</h2>
+    <div *ngIf="current() === 7" class="rounded-xl border bg-white p-5 md:p-6">
+      <h2 class="text-lg font-semibold mb-4">Durabilité &amp; potentiel de réplication</h2>
 
       <form [formGroup]="sustainabilityStep" class="grid gap-5">
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Durabilité (comment les effets perdurent ?)</label>
           <textarea rows="4"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="sustainability"></textarea>
         </div>
 
@@ -404,102 +459,111 @@
           <label class="text-sm font-medium text-gray-700">Potentiel de réplication (ailleurs au Gabon ?)</label>
           <textarea rows="4"
                     class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
-                       placeholder:text-gray-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                       placeholder:text-gray-400 outline-none focus:border-green-600 focus:ring-4 focus:ring-green-100"
                     formControlName="replicability"></textarea>
         </div>
       </form>
     </div>
 
     <!-- STEP 9 -->
-    <div *ngIf="current() === 8" class="card p-5 md:p-6">
+    <div *ngIf="current() === 8" class="rounded-xl border bg-white p-5 md:p-6">
       <h2 class="text-lg font-semibold mb-4">Annexes</h2>
 
       <div class="grid gap-4 md:grid-cols-2">
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Lettre de motivation</label>
-          <input type="file"
+          <input type="file" [attr.accept]="allowedAccept"
                  class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'LETTRE_MOTIVATION')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Statuts & règlement</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'STATUTS_REGLEMENT')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Fiche circuit (PME/PMI/Startup)</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'FICHE_CIRCUIT')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">RIB</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'RIB')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Agrément / Récépissé</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'AGREMENT')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">CV (porteur & responsables)</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'CV')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Budget détaillé</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'BUDGET_DETAILLE')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Chronogramme d'exécution</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'CHRONOGRAMME')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Cartographie (optionnel)</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'CARTOGRAPHIE')">
         </div>
 
         <div class="grid gap-1">
           <label class="text-sm font-medium text-gray-700">Lettre de soutien (optionnel)</label>
-          <input type="file" class="block w-full text-sm text-gray-700
-                    file:mr-3 file:py-2 file:px-4 file:rounded-lg
-                    file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+          <input type="file" [attr.accept]="allowedAccept"
+                 class="block w-full text-sm text-gray-700
+                        file:mr-3 file:py-2 file:px-4 file:rounded-lg
+                        file:border file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
                  (change)="onFileChange($event, 'LETTRE_SOUTIEN')">
         </div>
       </div>
     </div>
 
     <!-- STEP 10 -->
-    <div *ngIf="current() === 9" class="card p-5 md:p-6">
+    <div *ngIf="current() === 9" class="rounded-xl border bg-white p-5 md:p-6">
       <h2 class="text-lg font-semibold mb-4">Récapitulatif</h2>
 
       <div class="rounded-xl border p-3 mb-3">
@@ -524,8 +588,8 @@
         <strong>Résumé activités :</strong> {{ activitiesSummary.value || '—' }}<br>
         <strong>Activités :</strong>
         <ul class="list-disc ml-5">
-          <li *ngFor="let a of activities.controls">
-            {{ a.value.label }} — Mois : {{ (a.value.months || []).join(', ') || '—' }}
+          <li *ngFor="let a of activities.controls; trackBy: trackByIndex">
+            {{ a.value.label }} — Mois : {{ formatMonths(a.get('months')?.value) }}
           </li>
         </ul>
       </div>
@@ -533,7 +597,7 @@
       <div class="rounded-xl border p-3 mb-3">
         <strong>Budget :</strong>
         <ul class="list-disc ml-5">
-          <li *ngFor="let b of budgetLines.controls">
+          <li *ngFor="let b of budgetLines.controls; trackBy: trackByIndex">
             {{ b.value.category }} — {{ b.value.description }} — Total: {{ b.value.total | number:'1.0-0' }}
           </li>
         </ul>
@@ -551,29 +615,28 @@
       </div>
 
       <div class="mt-3 flex gap-2">
-        <button class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50" (click)="prev()">Retour</button>
-        <button class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" (click)="submit()">Soumettre</button>
+        <button class="px-3 py-2 rounded-lg border hover:bg-slate-50" (click)="prev()">Retour</button>
+        <button class="px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700" (click)="submit()">Soumettre</button>
       </div>
     </div>
 
   </section>
 
   <!-- ==== Colonne Aide contextuelle ==== -->
-  <!-- ==== Aide contextuelle (droite) ==== -->
-  <aside class="rounded-2xl border bg-white p-5 sticky top-4 h-max">
-    <!-- Descriptions par champ (dépend de l’étape) -->
-    <h3 class="text-base font-semibold mb-2">{{ help[current()].title }}</h3>
+  <aside class="sticky top-4 h-max rounded-xl border bg-white p-5">
+    <h3 class="text-base font-semibold mb-2">
+      <span class="inline-block rounded-md bg-green-100 text-green-800 px-2 py-0.5 text-xs align-middle">Guide</span>
+      {{ help[current()].title }}
+    </h3>
     <div class="space-y-2 text-sm text-gray-700" [innerHTML]="help[current()].html"></div>
 
-    <!-- Conseils pratiques -->
     <div class="mt-5 border-t pt-4">
-      <h4 class="text-sm font-semibold mb-1">Conseils pratiques pour la rédaction</h4>
+      <h4 class="text-sm font-semibold mb-1 text-green-700">Conseils pratiques</h4>
       <div class="space-y-2 text-sm text-gray-700" [innerHTML]="adviceHtml"></div>
     </div>
 
-    <!-- Sélection des dossiers -->
     <div class="mt-5 border-t pt-4">
-      <h4 class="text-sm font-semibold mb-1">Concernant la sélection des dossiers</h4>
+      <h4 class="text-sm font-semibold mb-1 text-green-700">Sélection des dossiers</h4>
       <div class="space-y-2 text-sm text-gray-700" [innerHTML]="selectionHtml"></div>
     </div>
   </aside>

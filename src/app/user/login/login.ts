@@ -1,13 +1,14 @@
+// login.ts
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router'; // ⬅️ + RouterLinkActive
 import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-user-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, RouterLinkActive], // ⬅️ ici aussi
   templateUrl: './login.html'
 })
 export class Login {

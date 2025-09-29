@@ -13,38 +13,32 @@ type Submission = {
   updatedAt: number; // epoch ms
 };
 
-const LS_SUBMISSION_KEY = 'submission_meta';       // état du projet unique
-const LS_DRAFT_FORM_KEY = 'draft_submission';      // autosave du wizard (étapes)
+const LS_SUBMISSION_KEY = 'submission_meta';
+const LS_DRAFT_FORM_KEY = 'draft_submission';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule],
-  templateUrl:  './dashboard.html',
+  templateUrl: './dashboard.html',
 })
 export class Dashboard {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private auth = inject(AuthService);
 
-  // ====== Profil mock (à brancher plus tard) ======
+  // ===== Profil (mock) =====
   user = signal({
     fullName: localStorage.getItem('user_fullName') || 'RAPONTCHOMBO MBA\'BU GEORGES CHRISTIAN',
     photoUrl: localStorage.getItem('user_photoUrl') || 'assets/avatar-placeholder.png',
   });
   imgError = signal(false);
   initials = computed(() =>
-    this.user().fullName
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(w => w[0]?.toUpperCase())
-      .join('') || 'U'
+    this.user().fullName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join('') || 'U'
   );
 
-  // ====== Un seul projet par utilisateur ======
+  // ===== Projet unique =====
   submission = signal<Submission | null>(this.loadSubmission());
-
   hasProject = computed(() => !!this.submission());
   isDraft = computed(() => this.submission()?.status === 'BROUILLON');
   status = computed<SubmissionStatus | null>(() => this.submission()?.status ?? null);
@@ -59,54 +53,51 @@ export class Dashboard {
     else localStorage.setItem(LS_SUBMISSION_KEY, JSON.stringify(s));
   }
 
-  // ====== Sidebar UI ======
-  asideOpen = signal(false); // mobile drawer
-
+  // ===== Sidebar =====
+  asideOpen = signal(false);
   toggleAside() { this.asideOpen.update(v => !v); }
 
-  // ====== Actions ======
+  // Bouton d’action principal (contextuel)
+  ctaLabel = computed(() => !this.hasProject() ? 'Créer votre projet'
+    : this.isDraft() ? 'Continuer le brouillon'
+      : 'Voir mon projet');
+  primaryActionClick() {
+    if (!this.hasProject()) return this.startProject();
+    if (this.isDraft()) return this.resumeDraft();
+    return this.viewProject();
+  }
+
+  // Chip de statut (classe tailwind)
+  statusClass = computed(() => {
+    switch (this.status()) {
+      case 'BROUILLON': return 'bg-slate-200 text-slate-800';
+      case 'SOUMIS':    return 'bg-blue-100 text-blue-800';
+      case 'EN_REVUE':  return 'bg-amber-100 text-amber-800';
+      case 'ACCEPTE':   return 'bg-emerald-100 text-emerald-800';
+      case 'REJETE':    return 'bg-rose-100 text-rose-800';
+      default:          return 'bg-slate-200 text-slate-800';
+    }
+  });
+
+  // ===== Actions projet =====
   startProject() {
-    // crée le projet unique si inexistant
     if (this.hasProject()) { this.goForm(); return; }
-    const s: Submission = {
-      id: 'PRJ-001', // l’id API remplacera plus tard
-      title: '',
-      status: 'BROUILLON',
-      updatedAt: Date.now(),
-    };
+    const s: Submission = { id: 'PRJ-001', title: '', status: 'BROUILLON', updatedAt: Date.now() };
     this.submission.set(s);
     this.persistSubmission(s);
-    // on démarre le wizard ; il restaurera depuis LS_DRAFT_FORM_KEY
     this.goForm();
   }
-
   resumeDraft() { this.goForm(); }
-
-  viewProject() {
-    // pour l’instant, on renvoie vers le récap du wizard (même route)
-    this.goForm();
-  }
-
+  viewProject() { this.goForm(); }
   submitProjectMock() {
-    // EXEMPLE (bouton masqué par défaut) : passer en "SOUMIS"
-    const s = this.submission();
-    if (!s) return;
-    s.status = 'SOUMIS';
-    s.updatedAt = Date.now();
-    this.submission.set({ ...s });
-    this.persistSubmission(this.submission()!);
+    const s = this.submission(); if (!s) return;
+    s.status = 'SOUMIS'; s.updatedAt = Date.now();
+    this.submission.set({ ...s }); this.persistSubmission(this.submission()!);
   }
-
   clearDraftOnly() { localStorage.removeItem(LS_DRAFT_FORM_KEY); }
-
-  logout() {
-    this.auth.logout();
-    this.router.navigateByUrl('/login');
-  }
-
   goForm() { this.router.navigateByUrl('/form'); }
 
-  // ====== Collaborateurs (affichés seulement si projet existe) ======
+  // ===== Collaborateurs =====
   showAddCollaborator = signal(false);
   collabForm = this.fb.group({
     fullName: ['', [Validators.required]],
@@ -119,5 +110,13 @@ export class Dashboard {
     this.collaborators.update(list => [...list, this.collabForm.value as any]);
     this.collabForm.reset({ role: 'Éditeur' });
     this.showAddCollaborator.set(false);
+    // localStorage.clear()
+  }
+
+  // ===== Divers =====
+  logout() { this.auth.logout(); this.router.navigateByUrl('/login'); }
+  scrollTo(id: string) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }

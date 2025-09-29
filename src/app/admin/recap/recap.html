@@ -1,0 +1,346 @@
+<!-- Fond de page changé (gris très clair FPBG) -->
+<section class="wrap">
+  <!-- Titre + actions : on garde les mêmes boutons et la même logique -->
+  <header class="header">
+    <div>
+      <h1 class="title">Récapitulatif du dossier</h1>
+      <p class="meta">
+        Statut :
+        <span class="font-medium">{{ status() || '—' }}</span>
+        <span class="dot">•</span>
+        Dernière mise à jour :
+        <span class="font-medium">
+          {{ submission()?.updatedAt ? (submission()?.updatedAt | date:'short') : '—' }}
+        </span>
+      </p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-outline" routerLink="/form">Modifier</a>
+      <a class="btn btn-outline" routerLink="/dashboard">Retour au dashboard</a>
+    </div>
+  </header>
+
+  <!-- STEP BY STEP — ancien style : barre horizontale + pastilles -->
+  <nav class="stepper">
+    <div class="line">
+      <div class="line-fill" [style.width.%]="progress()"></div>
+    </div>
+
+    <ol class="nodes">
+      <li *ngFor="let t of stepTitles; let i = index"
+          class="node"
+          [class.active]="i === stepIndex()"
+          [class.done]="i < stepIndex()">
+        <button type="button" class="node-btn" (click)="goTo(i)">
+          <span class="badge">{{ i + 1 }}</span>
+          <span class="label">{{ t }}</span>
+        </button>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Contenu d'étape (AFFICHAGE UNIQUEMENT) -->
+  <div class="content">
+    <!-- Étape 1 -->
+    <article *ngIf="stepIndex()===0" class="card">
+      <h2 class="card-title">1. Demandeur / Soumissionnaire</h2>
+      <div class="grid2">
+        <p><span class="muted">Organisation :</span> <b>{{ submission()?.step1?.orgName || '—' }}</b></p>
+        <p><span class="muted">Type :</span> <b>{{ submission()?.step1?.orgType || '—' }}</b></p>
+        <p class="span2"><span class="muted">Personne de contact :</span> <b>{{ submission()?.step1?.contactPerson || '—' }}</b></p>
+        <p><span class="muted">Couverture :</span> <b>{{ submission()?.step1?.geoCoverage || '—' }}</b></p>
+        <p><span class="muted">Domaines :</span> <b>{{ submission()?.step1?.domains || '—' }}</b></p>
+        <p class="span2"><span class="muted">Adresse :</span> <b>{{ submission()?.step1?.address || '—' }}</b></p>
+        <p><span class="muted">Email :</span> <b>{{ submission()?.step1?.contactEmail || '—' }}</b></p>
+        <p><span class="muted">Téléphone :</span> <b>{{ submission()?.step1?.contactPhone || '—' }}</b></p>
+      </div>
+    </article>
+
+    <!-- Étape 2 -->
+    <article *ngIf="stepIndex()===1" class="card">
+      <h2 class="card-title">2. Proposition de projet</h2>
+
+      <p class="mb8"><span class="muted">Titre :</span> <b>{{ submission()?.step2?.title || '—' }}</b></p>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Lieu &amp; groupe cible</p>
+          <button class="link" (click)="openModal('Lieu & groupe cible', submission()?.step2?.locationAndTarget)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.step2?.locationAndTarget) }}</p>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Contexte &amp; justification</p>
+          <button class="link" (click)="openModal('Contexte & justification', submission()?.step2?.contextJustification)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.step2?.contextJustification) }}</p>
+      </div>
+    </article>
+
+    <!-- Étape 3 -->
+    <article *ngIf="stepIndex()===2" class="card">
+      <h2 class="card-title">3. Objectifs &amp; résultats</h2>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Objectifs</p>
+          <button class="link" (click)="openModal('Objectifs', submission()?.step3?.objectives)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.step3?.objectives) }}</p>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Résultats attendus</p>
+          <button class="link" (click)="openModal('Résultats attendus', submission()?.step3?.expectedResults)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.step3?.expectedResults) }}</p>
+      </div>
+
+      <p class="mt8"><span class="muted">Durée :</span> <b>{{ submission()?.step3?.durationMonths || '—' }} mois</b></p>
+    </article>
+
+    <!-- Étape 4 -->
+    <article *ngIf="stepIndex()===3" class="card">
+      <h2 class="card-title">4. Activités &amp; calendrier</h2>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Résumé des activités</p>
+          <button class="link" (click)="openModal('Résumé des activités', submission()?.activitiesSummary)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.activitiesSummary) }}</p>
+      </div>
+
+      <p class="muted mb4">Activités</p>
+      <ul class="list">
+        <li *ngFor="let a of (submission()?.activities || [])">
+          {{ a.label }} <span class="muted" *ngIf="a.months?.length">— Mois : {{ a.months!.join(', ') }}</span>
+        </li>
+        <li *ngIf="!(submission()?.activities?.length)">—</li>
+      </ul>
+    </article>
+
+    <!-- Étape 5 -->
+    <article *ngIf="stepIndex()===4" class="card">
+      <h2 class="card-title">5. Risques &amp; atténuation</h2>
+
+      <div *ngIf="submission()?.risks?.length; else norisk" class="stack">
+        <div *ngFor="let r of submission()?.risks" class="row">
+          <p><span class="muted">Risque :</span> {{ r.description }}</p>
+          <p class="mt4"><span class="muted">Atténuation :</span> {{ r.mitigation }}</p>
+        </div>
+      </div>
+      <ng-template #norisk>—</ng-template>
+    </article>
+
+    <!-- Étape 6 -->
+    <article *ngIf="stepIndex()===5" class="card">
+      <h2 class="card-title">6. Budget estimatif</h2>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Catégorie</th>
+            <th>Description</th>
+            <th>Total</th>
+            <th>Part FPBG</th>
+            <th>Co-finance</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let b of (submission()?.budgetLines || [])">
+            <td>{{ b.category }}</td>
+            <td>{{ b.description }}</td>
+            <td>{{ b.total | number:'1.0-0' }}</td>
+            <td>{{ b.partFPBG || 0 | number:'1.0-0' }}</td>
+            <td>{{ b.partCofinance || 0 | number:'1.0-0' }}</td>
+          </tr>
+          <tr class="total">
+            <td colspan="2">Total</td>
+            <td>{{ budgetTotal() | number:'1.0-0' }}</td>
+            <td></td><td></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p *ngIf="budgetWarn()" class="warn">
+        Alerte : la rubrique « Fonctionnement » dépasse 10% du total.
+      </p>
+    </article>
+
+    <!-- Étape 7 -->
+    <article *ngIf="stepIndex()===6" class="card">
+      <h2 class="card-title">7. État &amp; financement</h2>
+      <p><span class="muted">Stade :</span> <b>{{ submission()?.stateStep?.projectStage || '—' }}</b></p>
+      <p class="mt4"><span class="muted">Financement :</span>
+        <b>{{ submission()?.stateStep?.hasFunding ? 'Oui' : 'Non' }}</b>
+      </p>
+      <div class="mt8" *ngIf="submission()?.stateStep?.fundingDetails">
+        <button class="link" (click)="openModal('Détails financement', submission()?.stateStep?.fundingDetails)">Voir les détails</button>
+      </div>
+    </article>
+
+    <!-- Étape 8 -->
+    <article *ngIf="stepIndex()===7" class="card">
+      <h2 class="card-title">8. Durabilité &amp; réplication</h2>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Durabilité</p>
+          <button class="link" (click)="openModal('Durabilité', submission()?.sustainabilityStep?.sustainability)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.sustainabilityStep?.sustainability) }}</p>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <p class="muted">Réplication</p>
+          <button class="link" (click)="openModal('Réplication', submission()?.sustainabilityStep?.replicability)">Voir en plein écran</button>
+        </div>
+        <p class="pre">{{ short(submission()?.sustainabilityStep?.replicability) }}</p>
+      </div>
+    </article>
+
+    <!-- Étape 9 -->
+    <!-- Étape 9 -->
+    <article *ngIf="stepIndex()===8" class="card">
+      <h2 class="card-title">9. Annexes</h2>
+
+      <ul class="annexes">
+        <li *ngFor="let key of (submission()?.attachments ? (Object.keys(submission()!.attachments!)) : [])" class="annexe-row">
+          <div class="annexe-meta">
+            <span class="annexe-key">{{ key }}</span>
+            <span class="annexe-name muted">{{ submission()!.attachments![key] }}</span>
+          </div>
+
+          <div class="annexe-actions">
+            <!-- Ouvrir dans un nouvel onglet -->
+            <a class="btn btn-ghost"
+               [href]="fileHref(submission()!.attachments![key])"
+               target="_blank" rel="noopener">
+              Ouvrir
+            </a>
+          </div>
+        </li>
+
+        <li *ngIf="!(submission()?.attachments)">—</li>
+      </ul>
+    </article>
+
+    <!-- Navigation bas de page (mêmes boutons/logic) -->
+    <div class="nav-bottom">
+      <button class="btn btn-ghost" (click)="prev()" [disabled]="stepIndex()===0">Étape précédente</button>
+      <button class="btn btn-brand" (click)="next()" [disabled]="stepIndex()===(stepTitles.length-1)">Étape suivante</button>
+    </div>
+  </div>
+
+  <!-- Modale plein écran (inchangée côté logique) -->
+  <div *ngIf="modalOpen()" class="modal">
+    <div class="backdrop" (click)="closeModal()"></div>
+    <div class="modal-box">
+      <header class="modal-head">
+        <h3 class="modal-title">{{ modal()?.title }}</h3>
+        <button class="btn btn-ghost" (click)="closeModal()">Fermer</button>
+      </header>
+      <div class="modal-body">
+        {{ modal()?.text || '—' }}
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-brand w100" (click)="closeModal()">J’ai compris</button>
+      </footer>
+    </div>
+  </div>
+</section>
+
+<!-- Styles locaux (ancien look stepper + fond modifié) -->
+<style>
+  :host {
+    --brand-teal: #0B1F2C;       /* FPBG */
+    --brand-green: #22c55e;      /* accent */
+    --bg-lite: #F5F7FA;          /* NOUVELLE COULEUR DE FOND */
+    --ink-900: #0f172a;
+    --ink-700: #334155;
+    --ink-600: #475569;
+    --border: #e2e8f0;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 16px; background: var(--bg-lite); border-radius: 16px; }
+  .header { display:flex; gap:12px; align-items:flex-end; justify-content:space-between; margin-bottom: 14px; }
+  .title { margin:0; font-size: clamp(20px,3vw,28px); font-weight:600; color: var(--ink-900); }
+  .meta { margin:4px 0 0; color: var(--ink-600); font-size: 14px; }
+  .dot { margin: 0 8px; color: #94a3b8; }
+  .actions { display:flex; gap:8px; }
+
+  /* Buttons */
+  .btn { border-radius:10px; padding:8px 12px; font-weight:500; cursor:pointer; }
+  .btn-outline { border:1px solid var(--border); background:#fff; color: var(--ink-900); }
+  .btn-brand { background: var(--brand-teal); color:#fff; border: none; }
+  .btn-ghost { border:1px solid var(--border); background:#fff; color: var(--ink-900); }
+  .link { color: var(--brand-teal); background: transparent; border: none; cursor:pointer; text-decoration: underline; }
+
+  /* Stepper ancien style */
+  .stepper { position:relative; padding: 16px 8px 0; margin-bottom: 14px; }
+  .line { position: relative; height: 4px; background: #e5e7eb; border-radius: 999px; }
+  .line-fill { height: 4px; background: var(--brand-green); border-radius: 999px; transition: width .25s ease; }
+  .nodes { display: grid; grid-template-columns: repeat(9, minmax(0,1fr)); gap: 4px; margin: 8px 0 0; padding: 0; list-style: none; }
+  .node { text-align: center; }
+  .node-btn { width: 100%; background: transparent; border: none; cursor: pointer; }
+  .badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    width: 28px; height: 28px; border-radius: 999px; font-weight: 700; color:#fff;
+    background:#94a3b8; /* neutre */
+  }
+  .label { display:block; margin-top: 4px; font-size: 12px; color: var(--ink-700); }
+  .node.active .badge { background: var(--brand-teal); }
+  .node.done .badge   { background: var(--brand-green); }
+  .node.active .label { color: var(--brand-teal); font-weight:600; }
+
+  /* Cartes/sections */
+  .content { display:flex; flex-direction: column; gap: 12px; }
+  .card { background:#fff; border:1px solid var(--border); border-radius: 16px; padding: 16px; }
+  .card-title { margin:0 0 8px; font-size: 18px; font-weight: 600; color: var(--ink-900); }
+  .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .span2 { grid-column: 1 / -1; }
+  .muted { color: var(--ink-700); }
+  .mb8 { margin-bottom: 8px; }
+  .mb4 { margin-bottom: 4px; }
+  .mt4 { margin-top: 4px; }
+  .mt8 { margin-top: 8px; }
+  .pre { white-space: pre-line; color: var(--ink-700); line-height: 1.6; }
+  .block { margin-top: 10px; }
+  .block-head { display:flex; align-items:center; justify-content: space-between; gap: 8px; }
+  .list { margin: 0 0 0 1.25rem; padding:0; list-style: disc; color: var(--ink-900); }
+  .stack .row { border:1px solid var(--border); border-radius:12px; padding:10px; }
+
+  .table-wrap { overflow-x: auto; }
+  .table { min-width: 680px; border-collapse: collapse; width: 100%; font-size: 14px; }
+  .table th, .table td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--border); vertical-align: top; }
+  .table thead th { color: var(--ink-700); border-top: none; }
+  .table .total td { font-weight: 600; }
+
+  .warn { margin-top: 6px; color: #dc2626; font-size: 12px; }
+
+  .nav-bottom { display:flex; align-items:center; justify-content:space-between; margin-top: 2px; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; z-index: 50; }
+  .backdrop { position: absolute; inset:0; background: rgba(0,0,0,.5); }
+  .modal-box { position: relative; width: min(720px, 92vw); margin: 10vh auto; background:#fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .modal-title { margin:0; font-size:16px; font-weight:600; color: var(--ink-900); }
+  .modal-body { max-height: 70vh; overflow:auto; padding: 16px; color: var(--ink-700); line-height: 1.7; white-space: pre-line; }
+  .modal-foot { padding: 12px 16px; border-top: 1px solid var(--border); }
+  .w100 { width: 100%; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .wrap { padding: 12px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .nodes { grid-template-columns: repeat(3, 1fr); row-gap: 10px; }
+  }
+</style>

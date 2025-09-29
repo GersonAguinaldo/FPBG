@@ -1,30 +1,80 @@
-<div class="mx-auto max-w-md">
-  <h1 class="mb-6 text-2xl font-semibold">Connexion porteur</h1>
+<!-- Fond plein écran -->
+<div class="min-h-screen grid place-items-center bg-[#1f3b52] px-4">
+  <!-- Carte -->
+  <div class="w-full max-w-xl rounded-2xl bg-[#112B3C] text-white p-8 shadow-2xl border border-white/10">
 
-  <form (ngSubmit)="submit()" [formGroup]="form" class="card space-y-4">
-    <div>
-      <label class="label">Email</label>
-      <input type="email" class="input" formControlName="email">
-      <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.email.touched && form.controls.email.invalid">
-        Email invalide
+    <!-- Logo -->
+    <div class="flex justify-center">
+      <img src="assets/logo.png" alt="FPBG" class="h-14 w-auto" />
+    </div>
+
+    <!-- Titre -->
+    <h1 class="mt-4 text-center text-4xl font-bold">Bienvenue</h1>
+
+    <!-- Onglets -->
+    <div class="mt-6 grid grid-cols-2 gap-3">
+      <a
+        routerLink="/login"
+        routerLinkActive="bg-green-600 text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="rounded-md bg-[#173B52] text-slate-200 px-4 py-2 text-sm font-semibold text-center hover:bg-[#1C4660] transition"
+      >Connexion</a>
+
+      <a
+        routerLink="/register"
+        routerLinkActive="bg-green-600 text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="rounded-md bg-[#173B52] text-slate-200 px-4 py-2 text-sm font-semibold text-center hover:bg-[#1C4660] transition"
+      >Inscription</a>
+    </div>
+
+    <!-- Formulaire -->
+    <form (ngSubmit)="submit()" [formGroup]="form" class="mt-6 space-y-4">
+      <!-- Email -->
+      <div>
+        <label class="block text-sm mb-1">Adresse e-mail</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="votre.email@exemple.com"
+          class="w-full rounded-lg bg-[#1f4a63] border border-white/10 text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <p class="mt-1 text-xs text-red-400" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+          Email invalide
+        </p>
+      </div>
+
+      <!-- Mot de passe + lien oublié -->
+      <div>
+        <div class="flex items-center justify-between">
+          <label class="block text-sm mb-1">Mot de passe</label>
+          <a routerLink="/forgot-password" class="text-xs text-green-400 hover:text-green-300">
+            Mot de passe oublié ?
+          </a>
+        </div>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="votre mot de passe"
+          class="w-full rounded-lg bg-[#1f4a63] border border-white/10 text-white placeholder-white/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <p class="mt-1 text-xs text-red-400" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+          6 caractères minimum
+        </p>
+      </div>
+
+      <!-- Bouton -->
+      <button
+        class="w-full rounded-lg bg-green-600 py-3 font-semibold hover:bg-green-700 disabled:opacity-60"
+        [disabled]="loading || form.invalid">
+        {{ loading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+      <!-- Lien bas -->
+      <p class="text-center text-sm text-slate-300">
+        Pas de compte ?
+        <a routerLink="/register" class="underline underline-offset-2 text-white">Créer un compte</a>
       </p>
-    </div>
-
-    <div>
-      <label class="label">Mot de passe</label>
-      <input type="password" class="input" formControlName="password">
-      <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.password.touched && form.controls.password.invalid">
-        6 caractères minimum
-      </p>
-    </div>
-
-    <button class="btn-primary w-full" [disabled]="loading || form.invalid">
-      {{ loading ? 'Connexion...' : 'Se connecter' }}
-    </button>
-
-    <div class="text-center text-sm">
-      Pas de compte ?
-      <a routerLink="/register" class="underline">Créer un compte</a>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>

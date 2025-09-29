@@ -7,7 +7,7 @@ import {
 import { Router } from '@angular/router';
 import { debounceTime } from 'rxjs/operators';
 
-// Angular Material (champs/boutons)
+// (Material importés mais non obligatoires — tu peux les retirer si tu ne les utilises pas)
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 const LS_DRAFT_KEY = 'draft_submission';
 const LS_STEP_KEY = 'draft_step_index';
 const SUBMISSION_META_KEY = 'submission_meta';
+const ADMIN_DATA_KEY = 'fpbg_admin_records';
 
 type BudgetCategory = 'ACTIVITES_TERRAIN' | 'INVESTISSEMENTS' | 'FONCTIONNEMENT';
 type DocumentType =
@@ -65,6 +66,13 @@ function budget10Percent(group: AbstractControl): ValidationErrors | null {
   if (total === 0) return null;
   return fonctionnement > total * 0.10 ? { overheadTooHigh: { fonctionnement, total } } : null;
 }
+// Chaque ligne : Part FPBG + Cofinance == Total (facultatif mais pratique)
+function amountsMatch(group: AbstractControl): ValidationErrors | null {
+  const total = Number(group.get('total')?.value || 0);
+  const a = Number(group.get('partFPBG')?.value || 0);
+  const b = Number(group.get('partCofinance')?.value || 0);
+  return (a + b) === total ? null : { amountsMismatch: true };
+}
 
 @Component({
   selector: 'app-submission-wizard',
@@ -90,24 +98,29 @@ export class SubmissionWizard {
   prev = () => this.goTo(this.current() - 1);
   progress = computed(() => Math.round(((this.current() + 1) / 10) * 100));
 
+  // Mois (labels façon tableau Jan→Déc du document)
   months = Array.from({ length: 12 }, (_, i) => i + 1);
-// …dans la classe SubmissionWizard
-  adviceHtml = `
-  <ul class="list-disc ml-4">
-    <li><b>Soyez clair et concis</b> : allez à l’essentiel pour susciter l’intérêt.</li>
-    <li><b>Impact</b> : mettez en avant les bénéfices concrets (environnementaux, sociaux, économiques, capacités).</li>
-    <li><b>Alignement</b> : vérifiez la cohérence avec les objectifs/priorités FPBG et les appels en cours.</li>
-    <li><b>Professionnalisme</b> : relisez, vérifiez chiffres et limites de mots, cohérence globale.</li>
-  </ul>
-`;
+  monthsLabels = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 
+  // Input accept pour <input type="file">
+  allowedAccept = ALLOWED_MIME.join(',');
+
+  // Conseils / textes droite
+  adviceHtml = `
+    <ul class="list-disc ml-4">
+      <li><b>Soyez clair et concis</b> : allez à l’essentiel pour susciter l’intérêt.</li>
+      <li><b>Impact</b> : mettez en avant les bénéfices concrets (environnementaux, sociaux, économiques, capacités).</li>
+      <li><b>Alignement</b> : cohérence avec les objectifs/priorités FPBG et les appels en cours.</li>
+      <li><b>Professionnalisme</b> : respect des limites de mots, chiffres vérifiés, cohérence globale.</li>
+    </ul>
+  `;
   selectionHtml = `
-  <ul class="list-disc ml-4">
-    <li>La <i>fiche d’évaluation</i> du processus de sélection est disponible (lien communiqué par FPBG).</li>
-    <li>Après analyse, les projets sont <b>classés par ordre de priorité</b> par le Comité Technique.</li>
-    <li>Le Comité Technique peut demander <b>des précisions</b> ou des <b>reformulations</b> selon les critères d’évaluation.</li>
-  </ul>
-`;
+    <ul class="list-disc ml-4">
+      <li>La fiche d’évaluation du processus de sélection est disponible (via FPBG).</li>
+      <li>Après analyse, les projets sont classés par ordre de priorité par le Comité Technique.</li>
+      <li>Le Comité Technique peut demander des précisions ou reformulations selon ses critères.</li>
+    </ul>
+  `;
 
   // ====== Step 1 : Demandeur ======
   step1 = this.fb.group({
@@ -226,7 +239,7 @@ export class SubmissionWizard {
       total: [total],
       partFPBG: [partFPBG],
       partCofinance: [partCofinance]
-    });
+    }, { validators: amountsMatch });
   }
   addBudgetLine(category?: BudgetCategory, description?: string, total?: number, partFPBG?: number, partCofinance?: number) {
     this.budgetLines.push(this.createBudgetLine(category, description, total, partFPBG, partCofinance));
@@ -253,12 +266,90 @@ export class SubmissionWizard {
     this.attachments.get(key)?.setValue(file);
   }
 
-  // Soumission (front-only)
+  // ===== Envoi vers l'espace Admin =====
+  private newProjectId(): string {
+    const t = Date.now().toString(36).toUpperCase();
+    return `PRJ-${t.slice(-6)}`;
+  }
+  private computeBudgetTotals() {
+    const lines = this.budgetLines.getRawValue() as Array<{
+      category: BudgetCategory; total: number; partFPBG: number; partCofinance: number;
+    }>;
+    const sum = (k: 'total' | 'partFPBG' | 'partCofinance') => lines.reduce((s, l) => s + (Number(l[k]) || 0), 0);
+    const total = sum('total');
+    const partFPBG = sum('partFPBG');
+    const partCofinance = sum('partCofinance');
+    const fonctionnement = lines.filter(l => l.category === 'FONCTIONNEMENT')
+      .reduce((s, l) => s + (Number(l.total) || 0), 0);
+    return { total, partFPBG, partCofinance, fonctionnement };
+  }
+  private getAttachmentsMeta() {
+    const out: Record<string, { name: string; size: number; type: string } | null> = {};
+    (Object.keys(this.attachments.controls) as DocumentType[]).forEach(k => {
+      const f = this.attachments.get(k)?.value as File | null;
+      out[k] = f ? { name: f.name, size: f.size, type: f.type } : null;
+    });
+    return out;
+  }
+
   submit() {
-    const meta = { id: 'PRJ-001', status: 'SOUMIS', updatedAt: Date.now() };
-    localStorage.setItem(SUBMISSION_META_KEY, JSON.stringify(meta));
+    const id = this.newProjectId();
+    const now = Date.now();
+
+    const applicant = this.step1.getRawValue();
+    const p2 = this.step2.getRawValue();
+    const p3 = this.step3.getRawValue();
+    const activitiesSummary = this.activitiesSummary.value || '';
+    const activities = this.activities.getRawValue();
+    const risks = this.risks.getRawValue();
+    const budgetLines = this.budgetLines.getRawValue();
+    const state = this.stateStep.getRawValue();
+    const sustain = this.sustainabilityStep.getRawValue();
+    const budgetTotals = this.computeBudgetTotals();
+    const attachments = this.getAttachmentsMeta();
+
+    const record = {
+      id,
+      status: 'SOUMIS' as const,
+      updatedAt: now,
+
+      applicant, // infos personnelles / organisation
+
+      project: {
+        title: p2.title,
+        locationAndTarget: p2.locationAndTarget,
+        contextJustification: p2.contextJustification,
+        objectives: p3.objectives,
+        expectedResults: p3.expectedResults,
+        durationMonths: p3.durationMonths,
+
+        activitiesSummary,
+        activities,          // [{label, months:number[]}]
+        risks,               // [{description, mitigation}]
+        budgetLines,         // [{category, description, total, partFPBG, partCofinance}]
+        budgetTotals,        // { total, fonctionnement, partFPBG, partCofinance }
+
+        stage: state.projectStage,
+        hasFunding: state.hasFunding,
+        fundingDetails: state.fundingDetails,
+
+        sustainability: sustain.sustainability,
+        replicability: sustain.replicability
+      },
+
+      attachments          // métadonnées fichiers (name/type/size)
+    };
+
+    const raw = localStorage.getItem(ADMIN_DATA_KEY);
+    const list = raw ? JSON.parse(raw) as any[] : [];
+    list.unshift(record);
+    localStorage.setItem(ADMIN_DATA_KEY, JSON.stringify(list));
+
+    // Meta pour l'espace utilisateur
+    localStorage.setItem(SUBMISSION_META_KEY, JSON.stringify({ id, status: 'SOUMIS', updatedAt: now }));
+
     alert('Votre dossier est marqué comme SOUMIS (simulation front).');
-    this.router.navigateByUrl('/dashboard');
+    this.router.navigateByUrl('/dashboard'); // ajuste si besoin
   }
 
   // Alerte budget
@@ -273,9 +364,9 @@ export class SubmissionWizard {
         <li><b>Organisation porteuse</b> : nom légal complet.</li>
         <li><b>Type d’organisation</b> : ONG, association communautaire, coopérative, PME/PMI/Startup…</li>
         <li><b>Personne de contact</b> : nom et prénom de l’interlocuteur principal.</li>
-        <li><b>Couverture géographique</b> : locale, régionale, nationale, ou zones précises (villes, villages, bassins versants, aires protégées…).</li>
-        <li><b>Domaines d’intervention</b> : conservation de la biodiversité, restauration des berges/dégradées, ingénierie écologique (fascines, enrochements végétalisés…), sensibilisation/éducation environnementale, suivi écologique…</li>
-        <li><b>Coordonnées</b> : adresse physique (complète), email de contact, numéro de téléphone.</li>
+        <li><b>Couverture géographique</b> : locale, régionale, nationale, ou zones précises.</li>
+        <li><b>Domaines d’intervention</b> : conservation, restauration, ingénierie écologique, sensibilisation…</li>
+        <li><b>Coordonnées</b> : adresse, email de contact, téléphone.</li>
       </ul>
       <p class="mt-2 text-xs text-gray-600">Ces informations servent aux communications officielles. Tenez-les à jour.</p>
     `
@@ -284,17 +375,9 @@ export class SubmissionWizard {
       title: 'Proposition de projet',
       html: `
       <ul class="list-disc ml-4">
-        <li><b>Titre du projet</b> : clair, concis, accrocheur, résumant l’objectif. <i>Ex.</i> « Restauration de 3&nbsp;km de berges dans la zone de XXXX pour la conservation de la biodiversité et la résilience climatique ».</li>
-        <li><b>Lieu d’exécution &amp; groupe cible</b> (≤&nbsp;200&nbsp;mots) : décrire les sites d’intervention (localisation), les communautés/bénéficiaires visés et la conservation communautaire le cas échéant.</li>
-        <li><b>Contexte &amp; justification</b> (≤&nbsp;500&nbsp;mots) :
-          <ul class="list-disc ml-6">
-            <li>Problèmes/pressions : érosion, inondations, pollution, pertes d’habitats, risques climatiques…</li>
-            <li>Causes et obstacles : facteurs anthropiques/naturels, gouvernance, capacités, financement…</li>
-            <li>Approches/solutions envisagées (techniques et sociales) et pourquoi elles sont adaptées au contexte.</li>
-            <li>Acteurs et ressources existants ; risques résiduels éventuels.</li>
-            <li>Qui bénéficie (ou pourrait être affecté négativement) ? Qu’est-ce qui est pris en compte ?</li>
-          </ul>
-        </li>
+        <li><b>Titre du projet</b> : clair, concis, accrocheur.</li>
+        <li><b>Lieu & groupe cible</b> (≤200 mots) : sites d’intervention et bénéficiaires.</li>
+        <li><b>Contexte & justification</b> (≤500 mots) : problèmes/pressions, causes, acteurs, solutions envisagées.</li>
       </ul>
     `
     },
@@ -302,19 +385,9 @@ export class SubmissionWizard {
       title: 'Objectifs & résultats',
       html: `
       <ul class="list-disc ml-4">
-        <li><b>Objectifs</b> (≤&nbsp;200&nbsp;mots) : formuler des objectifs <b>SMART</b> (spécifiques, mesurables, atteignables, réalistes, temporellement définis) avec indicateurs de suivi.</li>
-        <li><b>Résultats attendus</b> (≤&nbsp;100&nbsp;mots) : changements <b>mesurables</b> directement liés aux activités.
-          <div class="mt-1">
-            <b>Exemples :</b>
-            <ul class="list-disc ml-6">
-              <li>Amélioration de la résilience des écosystèmes riverains face aux changements climatiques.</li>
-              <li>Amélioration de la qualité de l’eau de la rivière.</li>
-              <li>Stabilisation accrue des berges et réduction significative de l’érosion.</li>
-              <li>Accroissement de la participation communautaire et de la sensibilisation aux enjeux environnementaux.</li>
-            </ul>
-          </div>
-        </li>
-        <li><b>Durée estimée du projet</b> : indiquer la durée totale <i>(ex. 12&nbsp;mois)</i>.</li>
+        <li><b>Objectifs</b> (≤200 mots) : formuler des objectifs SMART.</li>
+        <li><b>Résultats attendus</b> (≤100 mots) : changements <b>mesurables</b>.</li>
+        <li><b>Durée</b> : ex. 12 mois.</li>
       </ul>
     `
     },
@@ -322,27 +395,18 @@ export class SubmissionWizard {
       title: 'Activités & calendrier',
       html: `
       <ul class="list-disc ml-4">
-        <li><b>Activités principales</b> (≤&nbsp;200&nbsp;mots) : décrire les grandes lignes permettant d’atteindre les objectifs.</li>
-        <li><b>Calendrier d’exécution</b> : répartir chaque activité sur les mois (M1→M12/M18/M24…) en cochant les cases correspondantes.</li>
-        <li><b>Exemples d’activités</b> :
-          <ul class="list-disc ml-6">
-            <li>Cartographie détaillée des zones dégradées et analyse des données.</li>
-            <li>Conception et planification des interventions d’ingénierie écologique (fascines, enrochements végétalisés, etc.).</li>
-            <li>Plantation massive d’espèces végétales indigènes adaptées.</li>
-            <li>Mise en place de zones de suivi écologique (qualité de l’eau, inventaires des espèces).</li>
-            <li>Activités de sensibilisation et d’engagement communautaire.</li>
-          </ul>
-        </li>
+        <li><b>Activités principales</b> (≤200 mots).</li>
+        <li><b>Calendrier d’exécution</b> : cochez les mois pertinents.</li>
+        <li><b>Exemples</b> : cartographie, planification d’ingénierie écologique, plantations, suivi, sensibilisation…</li>
       </ul>
-      <p class="mt-2 text-xs text-gray-600">Assurez-vous que les activités respectent la <i>liste d’exclusion</i> FPBG (voir site FPBG).</p>
     `
     },
     {
       title: 'Risques',
       html: `
       <ul class="list-disc ml-4">
-        <li>Identifier les <b>risques techniques, environnementaux, sociaux ou politiques</b> liés au projet.</li>
-        <li>Décrire comment vous comptez <b>les éviter</b> ou <b>les atténuer</b> (mesures concrètes, responsables, timing).</li>
+        <li>Risques techniques, environnementaux, sociaux, politiques.</li>
+        <li>Mesures d’évitement ou d’atténuation.</li>
       </ul>
     `
     },
@@ -350,16 +414,9 @@ export class SubmissionWizard {
       title: 'Budget estimatif',
       html: `
       <ul class="list-disc ml-4">
-        <li><b>Estimation du coût total</b> du projet : détailler les <b>grandes rubriques</b> de coût, sans granularité excessive.</li>
-        <li>Indiquer les <b>cofinancements éventuels</b> (donateurs A/B), en nature ou en numéraire.</li>
-        <li>Les frais de <b>fonctionnement indirects</b> peuvent être inclus à <b>hauteur maximale de 10&nbsp;%</b> du total (règle FPBG).</li>
-        <li><b>Rubriques de budget</b> :
-          <ul class="list-disc ml-6">
-            <li>Activités de terrain</li>
-            <li>Investissements</li>
-            <li>Fonctionnement</li>
-          </ul>
-        </li>
+        <li>Trois rubriques : <b>Activités de terrain</b>, <b>Investissements</b>, <b>Fonctionnement</b>.</li>
+        <li>Co-financements éventuels, en numéraire ou en nature.</li>
+        <li>Les frais de fonctionnement indirects ≤ <b>10 %</b> du total.</li>
       </ul>
     `
     },
@@ -367,8 +424,8 @@ export class SubmissionWizard {
       title: 'État & financement',
       html: `
       <ul class="list-disc ml-4">
-        <li><b>État d’avancement</b> du projet : Conception, Démarrage, Avancé, Phase finale.</li>
-        <li><b>Financement déjà demandé/obtenu</b> : préciser bailleur(s), montant(s), statut (demandé, accordé), et informations utiles.</li>
+        <li>Stade : Conception, Démarrage, Avancé, Phase finale.</li>
+        <li>Financement : bailleur(s), montant(s), statut.</li>
       </ul>
     `
     },
@@ -376,27 +433,26 @@ export class SubmissionWizard {
       title: 'Durabilité & réplication',
       html: `
       <ul class="list-disc ml-4">
-        <li><b>Durabilité</b> : comment les effets positifs du projet seront-ils maintenus après sa fin (gouvernance, maintenance, capacités locales, modèles de gestion) ?</li>
-        <li><b>Potentiel de réplication</b> : le projet est-il réplicable ailleurs au Gabon ? Dans quelles conditions (coûts, compétences, partenaires, contexte) ?</li>
+        <li>Comment les effets perdurent après la fin du projet ?</li>
+        <li>Réplicabilité ailleurs au Gabon (conditions, partenaires, coûts).</li>
       </ul>
     `
     },
     {
       title: 'Annexes',
       html: `
-      <p class="mb-2">Téléverser les pièces justificatives requises (formats usuels : PDF/DOC/XLS/JPG/PNG, taille raisonnable).</p>
+      <p class="mb-2">Téléverser les pièces justificatives requises (PDF/DOC/XLS/JPG/PNG).</p>
       <ol class="list-decimal ml-5 space-y-1">
-        <li>Formulaire de Note Conceptuelle complété.</li>
-        <li>Lettre de motivation du porteur de projet.</li>
-        <li>Statuts et règlement intérieur (ONG/Coopératives).</li>
-        <li>Fiche circuit (PME/PMI/Startup).</li>
-        <li>RIB de l’organisation.</li>
-        <li>Copie de l’agrément ou récépissé d’existence, ou tout document prouvant l’existence de l’entité.</li>
-        <li>CV du porteur et des responsables techniques.</li>
-        <li>Budget détaillé du projet.</li>
-        <li>Chronogramme d’exécution.</li>
-        <li>Cartographie/localisation du projet (si disponible).</li>
-        <li>Lettre de partenariat ou de soutien (facultatif).</li>
+        <li>Lettre de motivation</li>
+        <li>Statuts & règlement</li>
+        <li>Fiche circuit (PME/PMI/Startup)</li>
+        <li>RIB</li>
+        <li>Agrément / Récépissé</li>
+        <li>CV (porteur & responsables)</li>
+        <li>Budget détaillé</li>
+        <li>Chronogramme</li>
+        <li>Cartographie (optionnel)</li>
+        <li>Lettre de soutien (optionnel)</li>
       </ol>
     `
     },
@@ -404,10 +460,22 @@ export class SubmissionWizard {
       title: 'Récapitulatif',
       html: `
       <ul class="list-disc ml-4">
-        <li>Relire l’ensemble du dossier : cohérence <b>objectifs ↔ activités ↔ budget</b>, limites de mots respectées, pièces jointes présentes.</li>
-        <li>Comparer aux critères et priorités FPBG, et corriger avant soumission si nécessaire.</li>
+        <li>Vérifier la cohérence <b>objectifs ↔ activités ↔ budget</b>.</li>
+        <li>Relire et corriger avant la soumission.</li>
       </ul>
     `
     }
   ];
+
+  // === Helpers UI ===
+  formatMonths(months?: number[] | null): string {
+    const arr = months ?? [];
+    return arr.length ? arr.map(m => this.monthsLabels[m - 1]).join(', ') : '—';
+  }
+  trackByIndex = (i: number) => i;
+
+  canGoNext(): boolean {
+    // Règle simple : autoriser le passage à l’étape suivante (tu peux raffiner si besoin)
+    return true;
+  }
 }

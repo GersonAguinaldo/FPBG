@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type Role = 'APPLICANT';
+export type Role = 'ADMIN' | 'APPLICANT';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -10,7 +10,7 @@ export class AuthService {
   isLoggedIn() { return !!this._token(); }
   role() { return this._role(); }
 
-  // Simule une connexion côté front (sans backend)
+  // ===== Connexions mock côté front =====
   loginApplicant(email: string, password: string) {
     localStorage.setItem('token', 'demo-token');
     localStorage.setItem('role', 'APPLICANT');
@@ -18,10 +18,15 @@ export class AuthService {
     this._role.set('APPLICANT');
   }
 
-  // Simule un enregistrement (backend branché plus tard)
+  loginAdmin(email: string, password: string) {
+    localStorage.setItem('token', 'demo-token');
+    localStorage.setItem('role', 'ADMIN');
+    this._token.set('demo-token');
+    this._role.set('ADMIN');
+  }
+
   register(payload: { fullName: string; email: string; password: string }) {
-    // TODO: appeler l'API réelle ici
-    return true;
+    return true; // à remplacer par l’appel API réel
   }
 
   logout() {
