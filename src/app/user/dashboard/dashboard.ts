@@ -19,7 +19,7 @@ const LS_DRAFT_FORM_KEY = 'draft_submission';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './dashboard.html',
 })
 export class Dashboard {
@@ -30,7 +30,7 @@ export class Dashboard {
   // ===== Profil (mock) =====
   user = signal({
     fullName: localStorage.getItem('user_fullName') || 'RAPONTCHOMBO MBA\'BU GEORGES CHRISTIAN',
-    photoUrl: localStorage.getItem('user_photoUrl') || 'assets/avatar-placeholder.png',
+    photoUrl: localStorage.getItem('user_photoUrl') || 'assets/logo-FPBG-Vert-.png',
   });
   imgError = signal(false);
   initials = computed(() =>
@@ -119,4 +119,9 @@ export class Dashboard {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+
+  photoError = signal<string | null>(null);
+
+
 }
