@@ -30,7 +30,7 @@ export class Dashboard {
   // ====== Profil mock (à brancher plus tard) ======
   user = signal({
     fullName: localStorage.getItem('user_fullName') || 'RAPONTCHOMBO MBA\'BU GEORGES CHRISTIAN',
-    photoUrl: localStorage.getItem('user_photoUrl') || 'assets/avatar-placeholder.png',
+    photoUrl: localStorage.getItem('user_photoUrl') || 'assets/logo-FPBG-Vert-.png',
   });
   imgError = signal(false);
   initials = computed(() =>
@@ -119,5 +119,33 @@ export class Dashboard {
     this.collaborators.update(list => [...list, this.collabForm.value as any]);
     this.collabForm.reset({ role: 'Éditeur' });
     this.showAddCollaborator.set(false);
+  }
+
+
+  photoError = signal<string | null>(null);
+
+  async onPhotoSelected(ev: Event) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    (ev.target as HTMLInputElement).value = ''; // reset pour permettre re-sélection
+    if (!file) return;
+
+    this.photoError.set(null);
+    try {
+      await this.auth.updatePhoto(file);
+      // Si vous avez un flag d’erreur d’image (fallback), réinitialisez-le :
+      if (this.imgError) this.imgError.set(false);
+    } catch (e) {
+      const code = String(e);
+      this.photoError.set(
+        code === 'SIZE'   ? 'Image trop lourde (max 3 Mo).'
+          : code === 'FORMAT' ? 'Format non supporté (image requise).'
+            : 'Impossible de lire le fichier.'
+      );
+    }
+  }
+
+  removePhoto() {
+    this.auth.clearPhoto();
+    if (this.imgError) this.imgError.set(false);
   }
 }

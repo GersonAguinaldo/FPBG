@@ -11,14 +11,14 @@
   <aside class="rounded-2xl self-start border p-5 bg-white sticky top-4 h-max">
     <div class="text-xs text-gray-600 mb-3">PROGRESSION</div>
     <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
-      <div class="h-2 rounded-full bg-blue-600" [style.width.%]="progress()"></div>
+      <div class="h-2 rounded-full bg-brand" [style.width.%]="progress()"></div>
     </div>
 
     <ol class="space-y-1 text-sm">
       <li *ngFor="let step of help; let i = index">
         <button type="button"
                 class="w-full text-left px-3 py-2 rounded-lg"
-                [ngClass]="i === current() ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'"
+                [ngClass]="i === current() ? 'bg-brand text-white' : 'hover:bg-gray-100'"
                 (click)="goTo(i)">
           {{ i+1 }}. {{ step.title }}
         </button>
@@ -26,9 +26,10 @@
     </ol>
 
     <div class="mt-4 flex gap-2">
-      <button class="btn px-3 py-2 border" (click)="prev()" [disabled]="current() === 0">Retour</button>
-      <button class="btn-primary px-3 py-2" (click)="next()" [disabled]="current() === 9">Suivant</button>
+      <button class="px-3 py-2 rounded-lg border hover:bg-gray-50" (click)="prev()" [disabled]="current() === 0">Retour</button>
+      <button class="btn-brand" (click)="next()" [disabled]="current() === 9">Suivant</button>
     </div>
+
   </aside>
 
   <!-- ==== Colonne Formulaire ==== -->
@@ -40,7 +41,8 @@
       <form [formGroup]="step1" class="grid gap-5 md:grid-cols-2">
         <div class="t-field md:col-span-2">
           <label class="t-label">Nom de l'organisation</label>
-          <input class="t-input" formControlName="orgName" placeholder="Ex : Association Rivière Claire">
+          <input class="block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-[15px] shadow-sm
+             placeholder:text-gray-400 focus-brand" formControlName="orgName" placeholder="Ex : Association Rivière Claire">
         </div>
 
         <div class="t-field md:col-span-2">
@@ -190,7 +192,7 @@
       <div class="flex items-center justify-between mt-2">
         <h3 class="font-medium">Activités</h3>
         <button type="button"
-                class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-sm"
+                class="px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 btn-brand-outline text-sm text-sm"
                 (click)="addActivity()">
           Ajouter une activité
         </button>

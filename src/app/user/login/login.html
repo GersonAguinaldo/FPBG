@@ -1,30 +1,46 @@
-<div class="mx-auto max-w-md">
-  <h1 class="mb-6 text-2xl font-semibold">Connexion porteur</h1>
-
-  <form (ngSubmit)="submit()" [formGroup]="form" class="card space-y-4">
-    <div>
-      <label class="label">Email</label>
-      <input type="email" class="input" formControlName="email">
-      <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.email.touched && form.controls.email.invalid">
-        Email invalide
-      </p>
+<section class="auth-screen">
+  <div class="auth-card">
+    <!-- logo (facultatif) -->
+    <!-- Bloc logo responsive, centré et bien cadré -->
+    <div class="mx-auto mb-4 h-12 sm:h-14 md:h-16 w-full max-w-[220px]">
+      <img
+        ngSrc="assets/logo-FPBG-Vert-.png"
+        width="3319" height="1820"
+      alt="FPBG"
+      class="block h-full w-full object-contain mx-auto select-none"
+      />
     </div>
 
-    <div>
-      <label class="label">Mot de passe</label>
-      <input type="password" class="input" formControlName="password">
-      <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.password.touched && form.controls.password.invalid">
-        6 caractères minimum
-      </p>
+
+    <h1 class="auth-title">Bienvenue</h1>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <a routerLink="/login" class="auth-tab auth-tab-active">Connexion</a>
+      <a routerLink="/register" class="auth-tab">Inscription</a>
     </div>
 
-    <button class="btn-primary w-full" [disabled]="loading || form.invalid">
-      {{ loading ? 'Connexion...' : 'Se connecter' }}
-    </button>
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-3">
+      <div>
+        <label class="auth-label">Adresse e-mail</label>
+        <input class="auth-input" type="email" formControlName="email"
+               placeholder="votre.email@exemple.com">
+      </div>
 
-    <div class="text-center text-sm">
-      Pas de compte ?
-      <a routerLink="/register" class="underline">Créer un compte</a>
-    </div>
-  </form>
-</div>
+      <div>
+        <div class="flex items-center justify-between">
+          <label class="auth-label">Mot de passe</label>
+          <a routerLink="/forgot" class="auth-link">Mot de passe oublié&nbsp;?</a>
+        </div>
+        <input class="auth-input" type="password" formControlName="password"
+               placeholder="Votre mot de passe">
+      </div>
+
+      <button class="auth-btn mt-2" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Se connecter</span>
+        <span *ngIf="loading">Connexion…</span>
+      </button>
+    </form>
+  </div>
+</section>

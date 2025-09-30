@@ -133,3 +133,78 @@ textarea.t-textarea.ng-invalid.ng-touched,
 select.t-select.ng-invalid.ng-touched {
   border-color: #ef4444; /* red-500 */
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .auth-screen { @apply min-h-screen grid place-items-center bg-slate-100; }
+
+  .auth-card {
+    @apply w-[420px] max-w-[92vw] rounded-2xl border border-white/10
+    bg-navy p-7 shadow-elev;
+  }
+
+  .auth-title { @apply text-center text-3xl font-semibold text-white mb-4; }
+
+  .auth-tabs { @apply flex gap-2 mb-4; }
+  .auth-tab {
+    @apply flex-1 text-center px-3 py-2 rounded-lg text-sm font-medium
+    bg-white/5 text-white/80 hover:bg-white/10 transition;
+  }
+  .auth-tab-active { @apply bg-brand text-white hover:bg-brand-dark; }
+
+  .auth-label { @apply text-sm text-white/80 mb-1; }
+
+  .auth-input {
+    @apply w-full rounded-lg border border-white/10 bg-white/10
+    text-white placeholder-white/50
+    focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent
+    px-3 py-2;
+  }
+
+  .auth-btn {
+    @apply w-full rounded-lg bg-brand hover:bg-brand-dark
+    text-white font-semibold py-3 transition disabled:opacity-60;
+  }
+
+  .auth-link { @apply text-xs text-brand/90 hover:text-brand; }
+}
+
+
+/* === FPBG theme tokens === */
+:root{
+  --brand-rgb: 52,130,57;       /* FPBG green rgb(52,130,57) */
+  --brand-700: 45,115,50;       /* hover/darker */
+  --brand-50:  231,244,233;     /* very light bg */
+}
+
+/* Color helpers */
+.bg-brand{ background-color: rgb(var(--brand-rgb)); }
+.bg-brand-50{ background-color: rgb(var(--brand-50)); }
+.text-brand{ color: rgb(var(--brand-rgb)); }
+.border-brand{ border-color: rgb(var(--brand-rgb)); }
+
+/* Buttons */
+.btn-brand{
+  @apply rounded-lg px-3 py-2 text-white shadow-sm;
+  background-color: rgb(var(--brand-rgb));
+}
+.btn-brand:hover{ background-color: rgb(var(--brand-700)); }
+
+/* Outlined button in brand color */
+.btn-brand-outline{
+  @apply rounded-lg px-3 py-2 bg-white;
+  color: rgb(var(--brand-rgb));
+  border: 1px solid rgb(var(--brand-rgb));
+}
+.btn-brand-outline:hover{
+  background-color: rgb(var(--brand-50));
+}
+
+/* Focus rings en vert */
+.focus-brand{
+  outline: none;
+  border-color: rgb(var(--brand-rgb)) !important;
+  box-shadow: 0 0 0 4px rgba(52,130,57,.15) !important;
+}

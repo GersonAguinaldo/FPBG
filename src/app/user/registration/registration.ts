@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AbstractControl, FormBuilder, ReactiveFormsModule /*, Validators*/ } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { OtpService } from '../../auth/otp.service'; // ← AJOUT
 
 // -- Option futur : validation 'mustMatch' (commentée)
 // function mustMatch(a: string, b: string) {
@@ -17,13 +18,14 @@ import { AuthService } from '../../core/auth.service';
 @Component({
   selector: 'app-registration',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
   templateUrl: './registration.html'
 })
 export class Registration {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private auth = inject(AuthService);
+  private otpService = inject(OtpService); // ← AJOUT
 
   // -- Version SANS validators exigés (front-only)
   form = this.fb.group({
@@ -34,8 +36,17 @@ export class Registration {
   }/*, { validators: mustMatch('password', 'confirm') }*/);
 
   submit() {
-    // NOTE: pas de .invalid ici -> on laisse toujours soumettre (front-only)
-    this.auth.register(this.form.value as any);   // mock
-    this.router.navigateByUrl('/login');
+    // Simule l'inscription + session locale
+    const { email, fullName } = this.form.value as { email?: string; fullName?: string };
+    const safeEmail = email && email.trim() ? email.trim() : 'demo@fpbg.local';
+    const safeName  = fullName && fullName.trim() ? fullName.trim() : 'Porteur de projet';
+
+    this.auth.registerDev(safeEmail, safeName);
+
+    // === OTP : émission + redirection vers la page OTP ===
+    this.otpService.issue(safeEmail);                             // génère le code (mock) + TTL
+    this.router.navigate(['/otp'], { queryParams: { email: safeEmail } }); // va sur l’écran OTP
+
+    // (Avant: this.router.navigateByUrl('/dashboard');)
   }
 }

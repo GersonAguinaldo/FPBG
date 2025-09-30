@@ -1,42 +1,40 @@
-<div class="mx-auto max-w-md">
-  <h1 class="mb-6 text-2xl font-semibold">Créer un compte porteur</h1>
+<section class="auth-screen">
+  <div class="auth-card">
+    <img ngSrc="assets/logo-FPBG-Vert-.png"
+         alt="FPBG"
+         class="block mx-auto mb-4 h-12 sm:h-14 md:h-16 w-auto object-contain select-none" height="1820" width="3319"/>
+    <h1 class="auth-title">Bienvenue</h1>
 
-  <form (ngSubmit)="submit()" [formGroup]="form" class="card space-y-4">
-    <div>
-      <label class="label">Nom complet</label>
-      <input class="input" formControlName="fullName" placeholder="Jane DOE" />
-      <!-- <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.fullName.touched && form.controls.fullName.invalid">
-        Nom requis (2 caractères min.)
-      </p> -->
+    <div class="auth-tabs">
+      <a routerLink="/login" class="auth-tab">Connexion</a>
+      <a routerLink="/register" class="auth-tab auth-tab-active">Inscription</a>
     </div>
 
-    <div>
-      <label class="label">Email</label>
-      <input type="email" class="input" formControlName="email" placeholder="nom@domaine.com" />
-      <!-- <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.email.touched && form.controls.email.invalid">
-        Email invalide
-      </p> -->
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-3">
       <div>
-        <label class="label">Mot de passe</label>
-        <input type="password" class="input" formControlName="password" />
+        <label class="auth-label">Nom complet</label>
+        <input class="auth-input" type="text" formControlName="fullName" placeholder="Nom & prénom">
       </div>
+
       <div>
-        <label class="label">Confirmer</label>
-        <input type="password" class="input" formControlName="confirm" />
-        <!-- <p class="mt-1 text-xs text-red-600" *ngIf="form.controls.confirm.touched && form.hasError('mustMatch', ['confirm'])">
-          Les mots de passe ne correspondent pas
-        </p> -->
+        <label class="auth-label">Adresse e-mail</label>
+        <input class="auth-input" type="email" formControlName="email" placeholder="votre.email@exemple.com">
       </div>
-    </div>
 
-    <!-- Bouton actif même si le formulaire est vide (front-only) -->
-    <button class="btn-primary w-full">Créer le compte</button>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label class="auth-label">Mot de passe</label>
+          <input class="auth-input" type="password" formControlName="password" placeholder="••••••••">
+        </div>
+        <div>
+          <label class="auth-label">Confirmer</label>
+          <input class="auth-input" type="password" formControlName="confirm" placeholder="••••••••">
+        </div>
+      </div>
 
-    <div class="text-center text-sm">
-      Déjà inscrit ? <a routerLink="/login" class="underline">Se connecter</a>
-    </div>
-  </form>
-</div>
+      <button class="auth-btn mt-2" type="submit">
+        Créer mon compte
+      </button>
+    </form>
+  </div>
+</section>

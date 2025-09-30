@@ -1,33 +1,76 @@
 import { Injectable, signal } from '@angular/core';
 
-export type Role = 'APPLICANT';
+export type User = {
+  id: string;
+  fullName: string;
+  email: string;
+  photoUrl?: string;
+};
+
+const LS_KEY = 'fpbg.user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private _token = signal<string | null>(localStorage.getItem('token'));
-  private _role  = signal<Role | null>(localStorage.getItem('role') as Role | null);
-
-  isLoggedIn() { return !!this._token(); }
-  role() { return this._role(); }
-
-  // Simule une connexion côté front (sans backend)
-  loginApplicant(email: string, password: string) {
-    localStorage.setItem('token', 'demo-token');
-    localStorage.setItem('role', 'APPLICANT');
-    this._token.set('demo-token');
-    this._role.set('APPLICANT');
+  private restore(): User | null {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) as User : null;
+    } catch {
+      return null;
+    }
   }
 
-  // Simule un enregistrement (backend branché plus tard)
-  register(payload: { fullName: string; email: string; password: string }) {
-    // TODO: appeler l'API réelle ici
-    return true;
+  private _user = signal<User | null>(this.restore());
+  user = this._user.asReadonly();
+
+  isLoggedIn() { return !!this._user(); }
+
+  // DEV: “connexion” locale (aucune vérif côté serveur)
+  loginDev(email: string, fullName = 'Utilisateur FPBG') {
+    const u: User = { id: 'dev-' + Date.now(), fullName, email };
+    this._user.set(u);
+    localStorage.setItem(LS_KEY, JSON.stringify(u));
+  }
+
+  // DEV: “inscription” locale (même logique)
+  registerDev(email: string, fullName: string) {
+    this.loginDev(email, fullName);
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    this._token.set(null);
-    this._role.set(null);
+    localStorage.removeItem(LS_KEY);
+    this._user.set(null);
+  }
+
+  // ...votre code existant (LS_KEY, _user, user, loginDev, registerDev, logout)
+
+  /** Stocke la photo (DataURL) dans le user + localStorage. Front-only. */
+  async updatePhoto(file: File): Promise<void> {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) throw 'FORMAT';
+    if (file.size > 3 * 1024 * 1024) throw 'SIZE'; // 3 Mo max (modifiez si besoin)
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = () => reject('READ');
+      r.readAsDataURL(file);
+    });
+
+    const u = this._user();
+    if (!u) throw 'NOAUTH';
+    const updated = { ...u, photoUrl: dataUrl };
+    this._user.set(updated);
+    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+  }
+
+  /** Supprime la photo du profil (localStorage + signal). */
+  clearPhoto(): void {
+    const u = this._user();
+    if (!u) return;
+    const updated = { ...u };
+    delete (updated as any).photoUrl;
+    this._user.set(updated);
+    localStorage.setItem(LS_KEY, JSON.stringify(updated));
   }
 }
